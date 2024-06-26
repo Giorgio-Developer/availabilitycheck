@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilità Villa Panorama</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="container mt-5 body_bg">
+
+    <div class="row" style="padding-top: 150px; text-align: center;">
+        <div class="form-group col-md-3">
+            &nbsp;
+        </div>
+        <div class="form-group col-md-6">
+            <h1>Verifica la disponibilità di camere per le date</h1>
+        </div>
+        <div class="form-group col-md-3">
+            &nbsp;
+        </div>
+    </div>
+    <form action="/freebusy" method="POST">
+        <div class="form-row" style="padding-top: 50px; text-align: center;">
+            <select id="calendarIdsFreeBusy" name="calendarIds" class="form-control" multiple="" required="" style="display: block;">
+                <option value="hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com">B&amp;B - Villa Panorama</option>
+                <option value="ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com">B&amp;B - Elettra</option>
+                <option value="1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com">B&amp;B - Calypso</option>
+            </select>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-3">
+                <label for="timeMin">Check-in:</label>
+                <input type="datetime-local" id="timeMin" name="timeMin" class="form-control date_picker" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="timeMax">Check-out:</label>
+                <input type="datetime-local" id="timeMax" name="timeMax" class="form-control date_picker" required>
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
+        <div class="form-row" style="padding-top: 50px; ">
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-6" style="text-align: center;">
+                <button type="submit" class="btn btn-primary">Controlla</button>
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
+    </form>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <script>
+        // // Funzione per ottenere i calendari e popolare la lista di selezione
+        // async function fetchCalendars() {
+
+        //     const calendarsToSkip = ['Holidays in Italy', 'booking.villapanorama@gmail.com'];
+
+        //     try {
+        //         console.log('Fetching calendars...');
+        //         const response = await fetch('/calendars');
+        //         // console.log(response);
+        //         const data = await response.json();
+        //         // console.log(data);
+        //         // const calendarSelect = document.getElementById('calendarIds');
+        //         const calendarSelectFreeBusy = document.getElementById('calendarIdsFreeBusy');
+
+        //         data.forEach(calendar => {
+        //             const option = document.createElement('option');
+        //             option.value = calendar.id;
+        //             option.textContent = calendar.summaryOverride ? calendar.summaryOverride :  calendar.summary;
+
+        //             // Salto i calendari che non mi servono
+        //             if (!calendarsToSkip.includes(option.textContent)) {
+
+        //                 const optionFreeBusy = option.cloneNode(true);
+
+        //                 calendarSelectFreeBusy.appendChild(optionFreeBusy);
+        //             }
+
+        //         });
+        //     } catch (error) {
+        //         console.error('Error fetching calendars:', error);
+        //     }
+        // }
+
+        // Chiamare la funzione quando la pagina è pronta
+        // document.addEventListener('DOMContentLoaded', fetchCalendars);
+
+    </script>
+</body>
+</html>

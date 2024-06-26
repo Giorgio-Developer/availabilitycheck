@@ -1,0 +1,29 @@
+1. Visitare Google Cloud Console con l'account dove esiste il calendario da interrogare
+2. Creare un nuovo progetto  (es. SopfiaCalendar)
+3. Andare su "API e Servizi" -> "Schermata consenso OAuth", selezionare "External" e "Crea"
+4. Dare un nome all'applicazione e selezionare l'email dell'account assistenza utenti e email di contatto sviluppatore (opzionalmente anche gli altri dati)
+5. Salva e Continua
+6. Aggiungi o rimuovi ambiti
+7. In "Aggiungi ambiti manualmente" aggiungere i seguenti ambiti:
+    - `https://www.googleapis.com/auth/calendar.readonly` "Aggiungi alla Tabella"
+    - `https://www.googleapis.com/auth/calendar.events.readonly` "Aggiungi alla Tabella"
+8. "Aggiorna" e "Salva e Continua"
+9. "Salva e Continua"
+10. "Back to Dashboard"
+11. Andare su "API e Servizi" -> "Credenziali"
+12. Cliccare su "Crea credenziali" -> "ID client OAuth" -> "Applicazione Web"
+13. [OPZIONALE] Inserire un nome e l'indirizzo del server 
+14. Inserire gli URI di reindirizzamento autorizzati:
+    - http://localhost:3000/oauth2callback
+    - http://localhost:3000
+15. Inserire gli URI di reindirizzamento JavaScript autorizzati:
+    - http://localhost:3000
+16. Cliccare su "Crea"
+17. Scaricare il file JSON e rinominarlo in "credentials.json"
+18. Editare il file "credentials.json" e aggiungere in fondo i valori:
+        "redirect_uris": ["http://localhost:3000/oauth2callback", "http://localhost:3000"],
+        "javascript_origins": ["http://localhost:3000"]
+19. Copiare il file nella cartella GoogleCalendar del progetto
+20. Attivare le API necessarie:
+    - Google Calendar API: https://console.cloud.google.com/apis/api/calendar-json.googleapis.com/overview?project=[NOME-PROGETTO]
+

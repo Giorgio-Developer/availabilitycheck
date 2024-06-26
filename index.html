@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Calendar Authorization</title>
+</head>
+<body>
+    <h1>Google Calendar Authorization</h1>
+    <button id="authorize-button">Autorizza Google Calendar</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/check-token');
+                const data = await response.json();
+                if (data.hasToken) {
+                    window.location.href = '/oauth2callback';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        document.getElementById('authorize-button').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/auth-url');
+                const data = await response.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Errore nel generare l\'URL di autorizzazione');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Errore nel contattare il server');
+            }
+        });
+    </script>
+</body>
+</html>
