@@ -23,6 +23,16 @@
     filter: invert(0.9);
 }
 
+#calendarIdsFreeBusy {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 5px;
+    width: 100%;
+    background-color: #11223355;
+    color: white;
+}
+
 .room {
     background-color: #11223355;
     color: white;
