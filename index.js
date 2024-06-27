@@ -4,6 +4,7 @@ const fs = require('fs'); // Aggiunto qui per risolvere l'errore precedente
 const GoogleCalendar = require('./GoogleCalendar');
 const app = express();
 const port = 3000;
+// const port = 4000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -16,13 +17,20 @@ const googleCalendar = new GoogleCalendar();
 const roomsNames = {
     "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com": "Villa Panorama",
     "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com": "Elettra",
-    "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com": "Calypso"
+    "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com": "Calypso",
+    "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com": "Hermes",
+    "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com": "Demetra",
+    "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "Iris Oasis",
 };
 
 const roomsImages = {
     "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com": "Villa_Panorama_Suite.jpg",
     "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com": "Elettra.jpg",
-    "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com": "Calypso.jpeg"
+    "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com": "Calypso.jpeg",
+    "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com": "Hermes.jpg",
+    "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com": "Demetra.jpg",
+    "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "IrisOasis.jpg",
+
 };
 
 // Servire la pagina HTML
