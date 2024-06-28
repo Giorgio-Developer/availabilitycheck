@@ -123,6 +123,8 @@ app.post('/freebusy', async (req, res) => {
             items: calendarIds.map(id => ({ id })),
         };
 
+        // console.log('Request body:', requestBody);
+
         const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
 
         // Analizza la risposta per verificare la disponibilità
