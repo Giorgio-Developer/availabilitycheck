@@ -33,6 +33,16 @@
     color: white;
 }
 
+#calendarCheckboxes {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 5px;
+    width: 100%;
+    background-color: #11223355;
+    color: white;
+    text-align: left;
+}
 .room {
     background-color: #11223355;
     color: white;
@@ -75,3 +85,57 @@ button:hover {
 .header button {
     margin-right: 10px;
 }
+
+
+
+/**********************/
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkbox-container div {
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9; /* Colore di sfondo deselezionato */
+    transition: background-color 0.3s;
+}
+
+.checkbox-container div input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-container div label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container div input[type="checkbox"]:checked + label {
+    background-color: #d1e7dd; /* Colore di sfondo selezionato */
+    border-color: #0f5132;
+    color: #0f5132;
+}
+
+/***********************/
+
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+  }
+  
