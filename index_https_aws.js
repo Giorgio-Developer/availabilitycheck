@@ -34,7 +34,6 @@ const roomsImages = {
 
 };
 
-
 // Funzione per leggere il CSV e restituire i dati
 async function readCSV(filename) {
     return new Promise((resolve, reject) => {
@@ -144,16 +143,12 @@ app.post('/events', async (req, res) => {
 });
 
 
-
 app.post('/freebusy', async (req, res) => {
     try {
         let { calendarIds, timeMin, timeMax } = req.body;
 
         // Leggi i dati dal CSV
-        const bookings = await readCSV('rooms_prices/demetra.csv');
-
-        console.log('bookings:', bookings);
-        // return;
+        const bookings = await readCSV('path/to/your/bookings.csv');
 
         // Assicurati che calendarIds sia un array
         if (!Array.isArray(calendarIds)) {
@@ -245,6 +240,106 @@ app.post('/freebusy', async (req, res) => {
     }
 });
 
+
+// app.post('/freebusy', async (req, res) => {
+
+//     try {
+//         let { calendarIds, timeMin, timeMax } = req.body;
+
+
+//         // Leggi i dati dal CSV
+//         const bookings = await readCSV('rooms_prices/demetra.csv');
+
+//         // Assicurati che calendarIds sia un array
+//         if (!Array.isArray(calendarIds)) {
+//             calendarIds = [calendarIds];
+//         }
+
+//         const oAuth2Client = await googleCalendar.authorize();
+
+//         const requestBody = {
+//             timeMin: new Date(timeMin).toISOString(),
+//             timeMax: new Date(timeMax).toISOString(),
+//             items: calendarIds.map(id => ({ id })),
+//         };
+
+//         // console.log('Request body:', requestBody);
+
+//         const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
+
+//         // Analizza la risposta per verificare la disponibilità
+//         const availableCalendars = Object.keys(freeBusyResponse).filter(calendarId => {
+//             const busyTimes = freeBusyResponse[calendarId].busy;
+//             return busyTimes.length === 0;
+//         }).map(calendarId => ({
+//             name: roomsNames[calendarId],
+//             image: roomsImages[calendarId]
+//         })); // Mappa gli ID dei calendari ai nomi delle stanze e alle immagini
+
+//         // Costruisci la pagina HTML con i risultati
+//         const htmlResponse = `
+//             <!DOCTYPE html>
+//                 <html lang="en">
+//                 <head>
+//                     <meta charset="UTF-8">
+//                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//                     <title>Disponibilità Villa Panorama</title>
+//                     <!-- Bootstrap CSS -->
+//                     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+//                     <link rel="stylesheet" href="assets/css/style.css">
+//                 </head>
+//                 <body class="container mt-5 body_bg">
+//                     <div class="header"  style="padding-top: 50px;">
+//                         <button onclick="window.history.back()">
+//                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+//                                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+//                             </svg>
+//                         </button>
+//                         <p>Camere disponibili nel periodo selezionato</p>
+//                     </div>
+//                     <div class="row" style="padding-top: 50px; text-align: center;">
+//                         <div class="form-group col-md-3">
+//                             &nbsp;
+//                         </div>
+//                         <div class="form-group col-md-6">
+//                             ${availableCalendars.length > 0 ? `
+//                                 <ul>
+//                                     ${availableCalendars.map(room => `
+//                                         <div class="room">
+//                                             <img src="/assets/images/${room.image}" alt="${room.name}">
+//                                             <div class="room-name">${room.name}</div>
+//                                         </div>
+                                        
+//                                     `).join('')}
+//                                 </ul>
+//                             ` : `
+//                             <p>Nessuno dei calendari è disponibile nel periodo selezionato.</p>
+//                         `}
+//                         </div>
+//                         <div class="form-group col-md-3">
+//                             &nbsp;
+//                         </div>
+//                     </div>
+
+//                     <!-- Bootstrap JS and dependencies -->
+//                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+//                     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+//                     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+//                 </body>
+//             </html>
+//         `;
+
+//         res.send(htmlResponse);
+
+//         // res.send(freeBusyResponse);
+//     } catch (error) {
+//         console.error('Error checking freeBusy:', error);
+//         res.status(500).send('Error checking freeBusy');
+//     }
+// });
+
+
 app.get('/calendars', async (req, res) => {
     try {
         const oAuth2Client = await googleCalendar.authorize();
@@ -257,7 +352,11 @@ app.get('/calendars', async (req, res) => {
 });
 
 
-// Avvia il server
+// Avvia il server HTTPS
+// https.createServer(sslOptions, app).listen(port, () => {
+//     console.log(`Server in ascolto su https://booking-api.it:${port}`);
+// });
+
 app.listen(port, () => {
     console.log(`Server in ascolto su http://localhost:${port}`);
 });
