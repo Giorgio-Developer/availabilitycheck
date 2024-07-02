@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilità Villa Panorama</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="container mt-5 body_bg">
+
+    <div class="row" style="padding-top: 150px; text-align: center;">
+        <div class="form-group col-md-3">
+            &nbsp;
+        </div>
+        <div class="form-group col-md-6">
+            <h1>Verifica la disponibilità di camere per le date</h1>
+        </div>
+        <div class="form-group col-md-3">
+            &nbsp;
+        </div>
+    </div>
+
+    <form action="https://booking-api.it/freebusy" method="POST">
+        <div class="form-row" style="padding-top: 50px; text-align: center;">
+
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-6">
+                <!-- <div id="calendarCheckboxes" class="form-group " style="display: block;">
+                    <div>
+                        <input type="checkbox" id="villaPanorama" name="calendarIds" class="calendarSel" value="hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com" checked>
+                        <label for="villaPanorama">B&amp;B - Villa Panorama</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="elettra" name="calendarIds" class="calendarSel" value="ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com" checked>
+                        <label for="elettra">B&amp;B - Elettra</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="calypso" name="calendarIds" class="calendarSel" value="1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com" checked>
+                        <label for="calypso">B&amp;B - Calypso</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="hermes" name="calendarIds" class="calendarSel" value="htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com" checked>
+                        <label for="hermes">B&amp;B - Hermes</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="demetra" name="calendarIds" value="ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com" checked>
+                        <label for="demetra">B&amp;B - Demetra</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="irisOasis" name="calendarIds" value="tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com" checked>
+                        <label for="irisOasis">B&amp;B - Iris Oasis</label>
+                    </div>
+                </div> -->
+
+                <div id="calendarCheckboxes" class="form-group" style="display: block;">
+                    <input type="hidden" id="villaPanorama" name="calendarIds" class="calendarSel" value="hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com">
+                    <input type="hidden" id="elettra" name="calendarIds" class="calendarSel" value="ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com">
+                    <input type="hidden" id="calypso" name="calendarIds" class="calendarSel" value="1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com">
+                    <input type="hidden" id="hermes" name="calendarIds" class="calendarSel" value="htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com">
+                    <input type="hidden" id="demetra" name="calendarIds" value="ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com">
+                    <input type="hidden" id="irisOasis" name="calendarIds" value="tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com">
+                </div>
+                
+                
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-3">
+                <label for="timeMin">Check-in:</label>
+                <input type="date" id="timeMin" name="timeMin" class="form-control date_picker" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="timeMax">Check-out:</label>
+                <input type="date" id="timeMax" name="timeMax" class="form-control date_picker" required>
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
+        <div class="form-row" style="padding-top: 50px; ">
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-6" style="text-align: center;">
+                <button type="submit" class="btn btn-primary">Controlla</button>
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
+    </form>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <script>
+        // document.getElementById('selectAllButton').addEventListener('click', function() {
+        //     const checkboxes = document.querySelectorAll('#calendarCheckboxes input[type="checkbox"]');
+        //     checkboxes.forEach(checkbox => checkbox.checked = true);
+        // });
+   </script>
+</body>
+</html>
