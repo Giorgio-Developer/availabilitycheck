@@ -4,6 +4,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { parse, format } = require('date-fns');
 const GoogleCalendar = require('./GoogleCalendar');
+const BookingHelper = require('./BookingHelper'); // Importa la classe BookingHelper
 const app = express();
 const port = 3000;
 
@@ -33,44 +34,46 @@ const roomsImages = {
     "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "IrisOasis.jpg",
 };
 
-// Funzione per leggere il CSV e restituire i dati
-async function readCSV(filename) {
-    return new Promise((resolve, reject) => {
-        const results = [];
-        fs.createReadStream(filename)
-            .pipe(csv({ separator: ',' }))
-            .on('data', (data) => results.push(data))
-            .on('end', () => resolve(results))
-            .on('error', (error) => reject(error));
-    });
-}
+const htmlResponsePrefix = `
+    <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Disponibilità Villa Panorama</title>
+            <!-- Bootstrap CSS -->
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="assets/css/style.css">
+        </head>
+        <body class="container mt-5 body_bg">
+            <div class="header" style="padding-top: 50px;">
+                <button onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                    </svg>
+                </button>
+                <p>Camere disponibili nel periodo selezionato</p>
+            </div>
+            <div class="row" style="padding-top: 50px; text-align: center;">
+                <div class="form-group col-md-3">
+                    &nbsp;
+                </div>
+`;
 
-// Funzione per calcolare il costo totale basato sulle date
-function calculateTotalCost(bookings, startDate, endDate) {
-    let totalCost = 0;
-    let currentDate = new Date(startDate);
+const htmlResponsePostfix = `
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
 
-    // Modifica: escludi l'ultimo giorno
-    const lastDate = new Date(endDate);
-    lastDate.setDate(lastDate.getDate() - 1);
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
-    while (currentDate <= lastDate) {
-        const formattedDate = format(currentDate, 'dd/MM/yy');
-        const booking = bookings.find(booking => {
-            const start = parse(booking['data inizio'], 'dd/MM/yy', new Date());
-            const end = parse(booking['data fine'], 'dd/MM/yy', new Date());
-            return currentDate >= start && currentDate <= end;
-        });
-
-        if (booking) {
-            totalCost += parseFloat(booking.costo.replace(',', '.'));
-        }
-
-        currentDate.setDate(currentDate.getDate() + 1); // Passa al giorno successivo
-    }
-
-    return totalCost.toFixed(2);
-}
+        </body>
+    </html>
+`;
 
 // Servire la pagina HTML
 app.get('/', async (req, res) => {
@@ -144,6 +147,8 @@ app.post('/events', async (req, res) => {
 });
 
 app.post('/freebusy', async (req, res) => {
+
+
     try {
         let { calendarIds, timeMin, timeMax } = req.body;
 
@@ -174,8 +179,8 @@ app.post('/freebusy', async (req, res) => {
 
         // Calcola il costo totale per il periodo selezionato per ogni calendario disponibile
         const roomCosts = await Promise.all(availableCalendars.map(async room => {
-            const bookings = await readCSV(`rooms_prices/${room.name}.csv`);
-            const totalCost = calculateTotalCost(bookings, timeMin, timeMax);
+            const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
+            const totalCost = BookingHelper.calculateTotalCost(bookings, timeMin, timeMax);
             return {
                 ...room,
                 totalCost
@@ -183,58 +188,29 @@ app.post('/freebusy', async (req, res) => {
         }));
 
         // Costruisci la pagina HTML con i risultati
-        const htmlResponse = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Disponibilità Villa Panorama</title>
-                <!-- Bootstrap CSS -->
-                <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="assets/css/style.css">
-            </head>
-            <body class="container mt-5 body_bg">
-                <div class="header" style="padding-top: 50px;">
-                    <button onclick="window.history.back()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                        </svg>
-                    </button>
-                    <p>Camere disponibili nel periodo selezionato</p>
-                </div>
-                <div class="row" style="padding-top: 50px; text-align: center;">
-                    <div class="form-group col-md-3">
-                        &nbsp;
-                    </div>
-                    <div class="form-group col-md-6">
-                        ${roomCosts.length > 0 ? `
-                            <ul>
-                                ${roomCosts.map(room => `
-                                    <div class="room">
-                                        <img src="/assets/images/${room.image}" alt="${room.name}">
-                                        <div class="room-name">${room.name}</div>
-                                        <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
-                                    </div>
-                                `).join('')}
-                            </ul>
-                        ` : `
-                            <p>Nessuno dei calendari è disponibile nel periodo selezionato.</p>
-                        `}
-                    </div>
-                    <div class="form-group col-md-3">
-                        &nbsp;
-                    </div>
-                </div>
 
-                <!-- Bootstrap JS and dependencies -->
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
-                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-
-            </body>
-            </html>
+        const htmlResponseRoomsList = `
+            <div class="form-group col-md-6">
+                ${roomCosts.length > 0 ? `
+                    <ul>
+                        ${roomCosts.map(room => `
+                            <div class="room">
+                                <img src="/assets/images/${room.image}" alt="${room.name}">
+                                <div class="room-name">${room.name}</div>
+                                <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
+                            </div>
+                        `).join('')}
+                    </ul>
+                ` : `
+                    <p>Nessuno dei calendari è disponibile nel periodo selezionato.</p>
+                `}
+            </div>
         `;
+
+
+
+
+        const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
 
         res.send(htmlResponse);
 
