@@ -1,16 +1,9 @@
-const https = require('https');
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const GoogleCalendar = require('./GoogleCalendar');
 const app = express();
-const port = 443; // Porta HTTPS
-// const port = 3000; // Porta HTTPS
-
-const sslOptions = {
-    key: fs.readFileSync('/etc/letsencrypt/live/booking-api.it/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/booking-api.it/fullchain.pem')
-};
+const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
