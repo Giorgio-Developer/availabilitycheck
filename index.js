@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const GoogleCalendar = require('./GoogleCalendar');
 const app = express();
-// const port = 443; // Porta HTTPS
-const port = 3000; // Porta HTTPS
+const port = 443; // Porta HTTPS
+// const port = 3000; // Porta HTTPS
 
 const sslOptions = {
     key: fs.readFileSync('/etc/letsencrypt/live/booking-api.it/privkey.pem'),
