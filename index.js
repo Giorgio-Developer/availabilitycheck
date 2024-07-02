@@ -1,10 +1,16 @@
+const https = require('https');
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
-const fs = require('fs'); // Aggiunto qui per risolvere l'errore precedente
 const GoogleCalendar = require('./GoogleCalendar');
 const app = express();
-const port = 3000;
-// const port = 4000;
+// const port = 443; // Porta HTTPS
+const port = 3000; // Porta HTTPS
+
+const sslOptions = {
+    key: fs.readFileSync('/etc/letsencrypt/live/booking-api.it/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/booking-api.it/fullchain.pem')
+};
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -212,7 +218,7 @@ app.get('/calendars', async (req, res) => {
 });
 
 
-// Avvia il server
-app.listen(port, () => {
-    console.log(`Server in ascolto su http://localhost:${port}`);
+// Avvia il server HTTPS
+https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`Server in ascolto su https://booking-api.it:${port}`);
 });
