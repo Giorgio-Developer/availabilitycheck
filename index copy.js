@@ -31,7 +31,9 @@ const roomsImages = {
     "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com": "Hermes.jpg",
     "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com": "Demetra.jpg",
     "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "IrisOasis.jpg",
+
 };
+
 
 // Funzione per leggere il CSV e restituire i dati
 async function readCSV(filename) {
@@ -50,11 +52,7 @@ function calculateTotalCost(bookings, startDate, endDate) {
     let totalCost = 0;
     let currentDate = new Date(startDate);
 
-    // Modifica: escludi l'ultimo giorno
-    const lastDate = new Date(endDate);
-    lastDate.setDate(lastDate.getDate() - 1);
-
-    while (currentDate <= lastDate) {
+    while (currentDate <= new Date(endDate)) {
         const formattedDate = format(currentDate, 'dd/MM/yy');
         const booking = bookings.find(booking => {
             const start = parse(booking['data inizio'], 'dd/MM/yy', new Date());
@@ -71,6 +69,8 @@ function calculateTotalCost(bookings, startDate, endDate) {
 
     return totalCost.toFixed(2);
 }
+
+
 
 // Servire la pagina HTML
 app.get('/', async (req, res) => {
@@ -143,9 +143,17 @@ app.post('/events', async (req, res) => {
     }
 });
 
+
+
 app.post('/freebusy', async (req, res) => {
     try {
         let { calendarIds, timeMin, timeMax } = req.body;
+
+        // Leggi i dati dal CSV
+        const bookings = await readCSV('rooms_prices/demetra.csv');
+
+        console.log('bookings:', bookings);
+        // return;
 
         // Assicurati che calendarIds sia un array
         if (!Array.isArray(calendarIds)) {
@@ -172,15 +180,8 @@ app.post('/freebusy', async (req, res) => {
             calendarId: calendarId,
         }));
 
-        // Calcola il costo totale per il periodo selezionato per ogni calendario disponibile
-        const roomCosts = await Promise.all(availableCalendars.map(async room => {
-            const bookings = await readCSV(`rooms_prices/${room.name}.csv`);
-            const totalCost = calculateTotalCost(bookings, timeMin, timeMax);
-            return {
-                ...room,
-                totalCost
-            };
-        }));
+        // Calcola il costo totale per il periodo selezionato
+        const totalCost = calculateTotalCost(bookings, timeMin, timeMax);
 
         // Costruisci la pagina HTML con i risultati
         const htmlResponse = `
@@ -208,13 +209,13 @@ app.post('/freebusy', async (req, res) => {
                         &nbsp;
                     </div>
                     <div class="form-group col-md-6">
-                        ${roomCosts.length > 0 ? `
+                        ${availableCalendars.length > 0 ? `
                             <ul>
-                                ${roomCosts.map(room => `
+                                ${availableCalendars.map(room => `
                                     <div class="room">
                                         <img src="/assets/images/${room.image}" alt="${room.name}">
                                         <div class="room-name">${room.name}</div>
-                                        <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
+                                        <div class="room-cost">Costo totale per il periodo selezionato: ${totalCost} €</div>
                                     </div>
                                 `).join('')}
                             </ul>
@@ -254,6 +255,7 @@ app.get('/calendars', async (req, res) => {
         res.status(500).send('Error fetching calendars');
     }
 });
+
 
 // Avvia il server
 app.listen(port, () => {
