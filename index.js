@@ -212,6 +212,10 @@ app.get('/calendars', async (req, res) => {
 
 
 // Avvia il server HTTPS
-https.createServer(sslOptions, app).listen(port, () => {
-    console.log(`Server in ascolto su https://booking-api.it:${port}`);
+// https.createServer(sslOptions, app).listen(port, () => {
+//     console.log(`Server in ascolto su https://booking-api.it:${port}`);
+// });
+
+app.listen(port, () => {
+    console.log(`Server in ascolto su http://localhost:${port}`);
 });
