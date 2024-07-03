@@ -1,8 +1,7 @@
 // BookingHelper.js
 const fs = require('fs');
 const csv = require('csv-parser');
-// const { parse, format } = require('date-fns');
-const moment = require('moment');
+const { parse, format } = require('date-fns');
 
 class BookingHelper {
     // Funzione per leggere il CSV e restituire i dati
@@ -20,23 +19,25 @@ class BookingHelper {
     // Funzione per calcolare il costo totale basato sulle date
     static calculateTotalCost(bookings, startDate, endDate) {
         let totalCost = 0;
-        let currentDate = moment(startDate, 'YYYY-MM-DD');
+        let currentDate = new Date(startDate);
 
-        // Modifica: escludi l'ultimo giorno
-        const lastDate = moment(endDate, 'YYYY-MM-DD').subtract(1, 'days');
+        // Escludi l'ultimo giorno
+        const lastDate = new Date(endDate);
+        lastDate.setDate(lastDate.getDate() - 1);
 
-        while (currentDate.isSameOrBefore(lastDate)) {
+        while (currentDate <= lastDate) {
+            const formattedDate = format(currentDate, 'dd/MM/yy');
             const booking = bookings.find(booking => {
-                const start = moment(booking['data inizio'], 'DD/MM/YY');
-                const end = moment(booking['data fine'], 'DD/MM/YY');
-                return currentDate.isBetween(start, end, null, '[]');
+                const start = parse(booking['data inizio'], 'dd/MM/yy', new Date());
+                const end = parse(booking['data fine'], 'dd/MM/yy', new Date());
+                return currentDate >= start && currentDate <= end;
             });
 
             if (booking) {
                 totalCost += parseFloat(booking.costo.replace(',', '.'));
             }
 
-            currentDate.add(1, 'days'); // Passa al giorno successivo
+            currentDate.setDate(currentDate.getDate() + 1); // Passa al giorno successivo
         }
 
         return totalCost.toFixed(2);
