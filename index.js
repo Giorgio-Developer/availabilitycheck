@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
-const { parse, format } = require('date-fns');
 const GoogleCalendar = require('./GoogleCalendar');
 const BookingHelper = require('./BookingHelper'); // Importa la classe BookingHelper
 const app = express();
