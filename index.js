@@ -147,6 +147,8 @@ app.post('/events', async (req, res) => {
 
 app.post('/freebusy', async (req, res) => {
 
+    const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
+    const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
 
     try {
 
@@ -159,6 +161,10 @@ app.post('/freebusy', async (req, res) => {
             calendarIds = [calendarIds];
         }
 
+        // Se ci sono più di 2 adulti, interroga solo i calendari di Villa Panorama e Calypso
+        if(adults > 2) 
+            calendarIds = [ id_villa_panorama, id_calypso ];
+
         const requestBody = {
             timeMin: new Date(timeMin).toISOString(),
             timeMax: new Date(timeMax).toISOString(),
@@ -167,9 +173,6 @@ app.post('/freebusy', async (req, res) => {
             children: parseInt(children, 10),
             pets: pets,
         };
-
-        console.log('Request body:', requestBody);
-
 
         const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
 
@@ -195,7 +198,6 @@ app.post('/freebusy', async (req, res) => {
         }));
 
         // Costruisci la pagina HTML con i risultati
-
         const htmlResponseRoomsList = `
             <div class="form-group col-md-6">
                 ${roomCosts.length > 0 ? `

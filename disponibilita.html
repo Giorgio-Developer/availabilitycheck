@@ -193,6 +193,20 @@
             document.getElementById('timeMax').value = checkOutString;
         });
 
+        document.getElementById('adults').addEventListener('change', function() {
+            const adultsCount = parseInt(this.value, 10);
+            const checkboxes = document.querySelectorAll('#calendarCheckboxes input[type="checkbox"]');
+
+            checkboxes.forEach(checkbox => {
+                if (adultsCount > 2 && !['villaPanorama', 'calypso'].includes(checkbox.id)) {
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false;
+                }
+            });
+        });
+
         document.getElementById('selectAllButton').addEventListener('click', function() {
             const checkboxes = document.querySelectorAll('#calendarCheckboxes input[type="checkbox"]');
             checkboxes.forEach(checkbox => checkbox.checked = true);
