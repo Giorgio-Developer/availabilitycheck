@@ -15,14 +15,14 @@
             &nbsp;
         </div>
         <div class="form-group col-md-6">
-            <h1>Verifica la disponibilità di camere per le date</h1>
+            <h1>Disponibilità</h1>
         </div>
         <div class="form-group col-md-3">
             &nbsp;
         </div>
     </div>
 
-    <div class="form-row" style="padding-top: 50px; text-align: center;">
+    <div class="form-row" style="padding-top: 10px; text-align: center;">
         <div class="form-group col-md-3">
             &nbsp;
         </div>
@@ -35,7 +35,7 @@
     </div>
 
     <form action="/freebusy" method="POST">
-        <div class="form-row" style="padding-top: 50px; text-align: center;">
+        <div class="form-row" style="padding-top: 10px; text-align: center;">
 
             <div class="form-group col-md-3">
                 &nbsp;
@@ -68,8 +68,9 @@
                         <label for="irisOasis">B&amp;B - Iris Oasis</label>
                     </div>
                 </div>
-                
             </div>
+
+            <!-- Check-in & Check-out-->
             <div class="form-group col-md-3">
                 &nbsp;
             </div>
@@ -87,7 +88,36 @@
             <div class="form-group col-md-3">
                 &nbsp;
             </div>
+
         </div>
+
+        <!-- Adulti, bambini & Animali-->
+
+        <div class="form-row" style="padding-top: 20px;">
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+            <div class="form-group col-md-2">
+                <label for="adults">Adulti:</label>
+                <input type="number" id="adults" name="adults" class="form-control number_field" min="1" max="3" value="1" required>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="children">Bambini (0-3 anni):</label>
+                <input type="number" id="children" name="children" class="form-control number_field" min="0" max="1" value="0" required>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="pets">Animali di piccola taglia:</label>
+                <select id="pets" name="pets" class="form-control number_field" required>
+                    <option value="no">No</option>
+                    <option value="yes">Sì</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                &nbsp;
+            </div>
+        </div>
+
+
         <div class="form-row" style="padding-top: 50px; ">
             <div class="form-group col-md-3">
                 &nbsp;
@@ -138,6 +168,30 @@
         // // Chiamare la funzione quando la pagina è pronta
         //  document.addEventListener('DOMContentLoaded', fetchCalendars);
 
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Imposta la data odierna e quella del giorno successivo nei campi di input
+            const today = new Date();
+            const theDayAfterTomorrow = new Date();
+            theDayAfterTomorrow.setDate(today.getDate() + 2);
+
+            const todayString = today.toISOString().split('T')[0];
+            const theDayAfterTomorrowString = theDayAfterTomorrow.toISOString().split('T')[0];
+
+            document.getElementById('timeMin').value = todayString;
+            document.getElementById('timeMax').value = theDayAfterTomorrowString;
+        });
+
+
+        document.getElementById('timeMin').addEventListener('change', function() {
+            const checkInDate = new Date(this.value);
+            const checkOutDate = new Date(checkInDate);
+            checkOutDate.setDate(checkInDate.getDate() + 2);
+
+            const checkOutString = checkOutDate.toISOString().split('T')[0];
+            document.getElementById('timeMax').value = checkOutString;
+        });
 
         document.getElementById('selectAllButton').addEventListener('click', function() {
             const checkboxes = document.querySelectorAll('#calendarCheckboxes input[type="checkbox"]');

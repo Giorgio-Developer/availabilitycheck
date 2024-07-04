@@ -37,6 +37,17 @@
     filter: invert(0.9) !important;
 }
 
+
+.number_field {
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    width: 100% !important;
+    background-color: #11223355 !important;
+    color: white !important;
+}
+
 #calendarIdsFreeBusy {
     border: 1px solid #ccc;
     border-radius: 4px;

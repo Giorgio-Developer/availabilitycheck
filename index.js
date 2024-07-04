@@ -149,20 +149,27 @@ app.post('/freebusy', async (req, res) => {
 
 
     try {
-        let { calendarIds, timeMin, timeMax } = req.body;
+
+        const oAuth2Client = await googleCalendar.authorize();
+
+        let { calendarIds, timeMin, timeMax, adults, children, pets } = req.body;
 
         // Assicurati che calendarIds sia un array
         if (!Array.isArray(calendarIds)) {
             calendarIds = [calendarIds];
         }
 
-        const oAuth2Client = await googleCalendar.authorize();
-
         const requestBody = {
             timeMin: new Date(timeMin).toISOString(),
             timeMax: new Date(timeMax).toISOString(),
             items: calendarIds.map(id => ({ id })),
+            adults: parseInt(adults, 10),
+            children: parseInt(children, 10),
+            pets: pets,
         };
+
+        console.log('Request body:', requestBody);
+
 
         const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
 
@@ -179,7 +186,8 @@ app.post('/freebusy', async (req, res) => {
         // Calcola il costo totale per il periodo selezionato per ogni calendario disponibile
         const roomCosts = await Promise.all(availableCalendars.map(async room => {
             const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
-            const totalCost = BookingHelper.calculateTotalCost(bookings, timeMin, timeMax);
+            // const totalCost = BookingHelper.calculateTotalCost(bookings, timeMin, timeMax);
+            const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
             return {
                 ...room,
                 totalCost
@@ -205,9 +213,6 @@ app.post('/freebusy', async (req, res) => {
                 `}
             </div>
         `;
-
-
-
 
         const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
 
