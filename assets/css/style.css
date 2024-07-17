@@ -1,7 +1,7 @@
 .body_bg {
     background-color: #f8f9fa;
     background-image: url(https://villapanoramasuite.it/wp-content/uploads/2022/06/sfon_1-1.jpg);
-	background-repeat: no-repeat;
+	background-repeat: repeat-y
     background-size: cover;
     color: white;
 

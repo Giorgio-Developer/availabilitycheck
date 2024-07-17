@@ -146,14 +146,11 @@ app.post('/events', async (req, res) => {
 });
 
 app.post('/freebusy', async (req, res) => {
-
     const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
     const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
 
     try {
-
         const oAuth2Client = await googleCalendar.authorize();
-
         let { calendarIds, timeMin, timeMax, adults, children, pets } = req.body;
 
         // Assicurati che calendarIds sia un array
@@ -161,9 +158,8 @@ app.post('/freebusy', async (req, res) => {
             calendarIds = [calendarIds];
         }
 
-        // Se ci sono più di 2 adulti, interroga solo i calendari di Villa Panorama e Calypso
         if(adults > 2) 
-            calendarIds = [ id_villa_panorama, id_calypso ];
+            calendarIds = [id_villa_panorama, id_calypso];
 
         const requestBody = {
             timeMin: new Date(timeMin).toISOString(),
@@ -176,7 +172,7 @@ app.post('/freebusy', async (req, res) => {
 
         const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
 
-        // Analizza la risposta per verificare la disponibilità
+        // Calendari disponibili
         const availableCalendars = Object.keys(freeBusyResponse).filter(calendarId => {
             const busyTimes = freeBusyResponse[calendarId].busy;
             return busyTimes.length === 0;
@@ -186,17 +182,18 @@ app.post('/freebusy', async (req, res) => {
             calendarId: calendarId,
         }));
 
-        // Calcola il costo totale per il periodo selezionato per ogni calendario disponibile
-        const roomCosts = await Promise.all(availableCalendars.map(async room => {
-            const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
-            // const totalCost = BookingHelper.calculateTotalCost(bookings, timeMin, timeMax);
-            const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
-            return {
-                ...room,
-                totalCost
-            };
-        }));
+        if (availableCalendars.length > 0) {
+            // Logica esistente se ci sono camere disponibili
+            const roomCosts = await Promise.all(availableCalendars.map(async room => {
+                const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
+                const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
+                return {
+                    ...room,
+                    totalCost
+                };
+            }));
 
+            // Costruisci risposta HTML con i risultati
         // Costruisci la pagina HTML con i risultati
         const htmlResponseRoomsList = `
             <div class="form-group col-md-6">
@@ -217,14 +214,92 @@ app.post('/freebusy', async (req, res) => {
         `;
 
         const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
-
         res.send(htmlResponse);
 
+
+        } else {
+            // Trova prossime disponibilità utilizzando la risposta di checkFreeBusy
+            let alternativeAvailability = [];
+            for (const calendarId of calendarIds) {
+                const busyPeriods = freeBusyResponse[calendarId].busy;
+                const periods = findNextAvailablePeriods(busyPeriods, timeMin, timeMax);
+                if (periods.length > 0) {
+                    alternativeAvailability.push({
+                        calendarId: calendarId,
+                        name: roomsNames[calendarId],
+                        image: roomsImages[calendarId],
+                        availablePeriods: periods.map(period => ({
+                            start: formatDate(period.start),
+                            end: formatDate(period.end)
+                        }))
+                    });
+                }
+            }
+
+            // Costruisci risposta HTML per periodi alternativi
+            const htmlAlternativeResponse = `
+                <div class="form-group col-md-6">
+                    <h4>Periodi alternativi disponibili:</h4>
+                    <ul>
+                        ${alternativeAvailability.map(room => `
+                            <div class="room">
+                                <img src="/assets/images/${room.image}" alt="${room.name}">
+                                <div class="room-name">${room.name}</div>
+                                <ul style="font-weight: 300;">
+                                    ${room.availablePeriods.map(period => `<li>Dal ${period.start} al ${period.end}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+            const htmlResponse = htmlResponsePrefix + htmlAlternativeResponse + htmlResponsePostfix;
+
+            res.send(htmlResponse);
+        }
     } catch (error) {
         console.error('Error checking freeBusy:', error);
         res.status(500).send('Error checking freeBusy');
     }
 });
+
+function findNextAvailablePeriods(busyPeriods, timeMin, timeMax) {
+    const availablePeriods = [];
+
+    if (busyPeriods.length === 0) {
+        // Se non ci sono periodi occupati, tutto il range è disponibile
+        availablePeriods.push({ start: timeMin, end: timeMax });
+        return availablePeriods;
+    }
+
+    // Aggiungi disponibilità prima del primo periodo occupato
+    if (new Date(busyPeriods[0].start).getTime() > new Date(timeMin).getTime()) {
+        availablePeriods.push({ start: timeMin, end: busyPeriods[0].start });
+    }
+
+    // Calcola i gap tra i periodi occupati
+    for (let i = 0; i < busyPeriods.length - 1; i++) {
+        if (new Date(busyPeriods[i].end).getTime() < new Date(busyPeriods[i + 1].start).getTime()) {
+            availablePeriods.push({ start: busyPeriods[i].end, end: busyPeriods[i + 1].start });
+        }
+    }
+
+    // Aggiungi disponibilità dopo l'ultimo periodo occupato
+    if (new Date(busyPeriods[busyPeriods.length - 1].end).getTime() < new Date(timeMax).getTime()) {
+        availablePeriods.push({ start: busyPeriods[busyPeriods.length - 1].end, end: timeMax });
+    }
+
+    return availablePeriods;
+}
+
+function formatDate(dateIsoString) {
+    const date = new Date(dateIsoString);
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript conta i mesi da 0
+    let year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
 
 app.get('/calendars', async (req, res) => {
     try {
