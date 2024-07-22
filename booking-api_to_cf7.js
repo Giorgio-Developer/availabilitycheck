@@ -10,17 +10,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funzione per convertire la data da YYYY-mm-dd a dd-mm-YYYY
     function convertDateFormat(dateString) {
-        var parts = dateString.split('-');
+        let parts = dateString.split('-');
         return parts[2] + '-' + parts[1] + '-' + parts[0];
     }
 
+    const roomsImages = {
+        "Villa Panorama": "Villa_Panorama_Suite.jpg",
+        "Elettra": "Elettra.jpg",
+        "Calypso": "Calypso.jpeg",
+        "Hermes": "Hermes.jpg",
+        "Demetra": "Demetra.jpg",
+        "Iris Oasis": "IrisOasis.jpg",
+    };
+
     // Ottieni i valori dai parametri dell'URL
-    var room = getUrlParameter('room');
-    var checkin = getUrlParameter('checkin');
-    var checkout = getUrlParameter('checkout');
-    var adults = getUrlParameter('adults');
-    var children = getUrlParameter('children');
-    var pets = getUrlParameter('pets');
+    let room = getUrlParameter('room');
+    let checkin = getUrlParameter('checkin');
+    let checkout = getUrlParameter('checkout');
+    let adults = getUrlParameter('adults');
+    let children = getUrlParameter('children');
+    let pets = getUrlParameter('pets');
+
+    let roomImage = document.getElementById('roomImage');
+
+    if (room) {
+        roomImage.src = "https://booking-api.it/assets/images/" + roomsImages[room];
+    } else {
+        roomImage.src = "https://villapanoramasuite.it/wp-content/uploads/2023/02/villa-panorama-2-240px-1.png";
+    }
 
     // Precompila i campi del form
     let messaggio = "";
