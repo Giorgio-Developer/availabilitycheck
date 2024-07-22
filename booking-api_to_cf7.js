@@ -39,43 +39,54 @@ document.addEventListener('DOMContentLoaded', function() {
         roomImage.src = "https://villapanoramasuite.it/wp-content/uploads/2023/02/villa-panorama-2-240px-1.png";
     }
 
-    // Precompila i campi del form
-    let messaggio = "";
+    // Precompila i campi del form e rendili non modificabili
+    if (checkin) {
+        let checkinInput = document.getElementById('checkin');
+        checkinInput.value = checkin;
 
-    if(room) 
-        messaggio = messaggio + "Camera: " + room + "\n";
+        let checkinText = document.getElementById('checkinText');
+        checkinText.innerHTML = convertDateFormat(checkin);
+    }
 
-    // if(checkin && checkout)
-    //     messaggio = messaggio + "Periodo: dal " + convertDateFormat(checkin) + " al " + convertDateFormat(checkout) + "\n";
+    if (checkout) {
+        let checkoutInput = document.getElementById('checkout');
+        checkoutInput.value = checkout;
 
-    if(adults)
-        messaggio = messaggio + "Adulti: " + adults + "\n";
+        let checkoutText = document.getElementById('checkoutText');
+        checkoutText.innerHTML = convertDateFormat(checkout);
+    }
 
-    if(children)
-        messaggio = messaggio + "Bambini: " + children + "\n";
+    if(adults) {
+        let adultsInput = document.getElementById('adults');
+        adultsInput.value = adults;
 
-    if(pets)
-        messaggio = messaggio + "Animali: " + pets + "\n";
+        let adultsText = document.getElementById('adultsText');
+        adultsText.innerHTML = adults;
+    }
 
-    const yourmessageEl = document.getElementsByName('your-message')[0];
-    yourmessageEl.innerHTML = messaggio;
+    if(room) {
+        let roomInput = document.getElementById('room');
+        roomInput.value = room;
 
-        // Precompila i campi del form e rendili non modificabili
-        if (checkin) {
-            let checkinInput = document.getElementById('checkin');
-            checkinInput.value = checkin;
+        let roomText = document.getElementById('roomText');
+        roomText.innerHTML = room;
 
-            let checkinText = document.getElementById('checkinText');
-            checkinText.innerHTML = convertDateFormat(checkin);
-        }
+    }
 
-        if (checkout) {
-            let checkoutInput = document.getElementById('checkout');
-            checkoutInput.value = checkout;
+    if(children) {
+        let childrenInput = document.getElementById('children');
+        childrenInput.value = children;
 
-            let checkoutText = document.getElementById('checkoutText');
-            checkoutText.innerHTML = convertDateFormat(checkout);
+        let childrenText = document.getElementById('childrenText');
+        childrenText.innerHTML = children;
+    }
 
-        }
+    if(pets) {
+        let petsInput = document.getElementById('pets');
+        petsInput.value = pets;
+
+        let petsText = document.getElementById('petsText');
+        petsText.innerHTML = pets;
+    }
 
 });
