@@ -203,7 +203,7 @@ app.post('/freebusy', async (req, res) => {
                                     <img src="/assets/images/${room.image}" alt="${room.name}">
                                     <div class="room-name">${room.name}</div>
                                     <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}" class="btn btn-primary">Prenota ora</a>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">Prenota ora</a>
                                 </div>
                             `).join('')}
                         </ul>

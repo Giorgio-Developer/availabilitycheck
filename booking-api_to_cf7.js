@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let adults = getUrlParameter('adults');
     let children = getUrlParameter('children');
     let pets = getUrlParameter('pets');
+    let price = getUrlParameter('price');
 
     let roomImage = document.getElementById('roomImage');
 
@@ -87,6 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let petsText = document.getElementById('petsText');
         petsText.innerHTML = pets;
+    }
+
+    if(price) {
+        let priceInput = document.getElementById('price');
+        priceInput.value = price;
+
+        let priceText = document.getElementById('priceText');
+        priceText.innerHTML = price;
     }
 
 });
