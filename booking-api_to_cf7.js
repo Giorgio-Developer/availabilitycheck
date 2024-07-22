@@ -71,6 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let roomText = document.getElementById('roomText');
         roomText.innerHTML = room;
+        
+        let roomName = document.getElementById('roomName');
+        roomName.innerHTML = room;
 
     }
 
@@ -95,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         priceInput.value = price;
 
         let priceText = document.getElementById('priceText');
-        priceText.innerHTML = price;
+        priceText.innerHTML =  price+" €";
     }
 
 });
