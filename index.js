@@ -183,7 +183,6 @@ app.post('/freebusy', async (req, res) => {
         }));
 
         if (availableCalendars.length > 0) {
-            // Logica esistente se ci sono camere disponibili
             const roomCosts = await Promise.all(availableCalendars.map(async room => {
                 const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
                 const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
@@ -192,31 +191,30 @@ app.post('/freebusy', async (req, res) => {
                     totalCost
                 };
             }));
-
-            // Costruisci risposta HTML con i risultati
-        // Costruisci la pagina HTML con i risultati
-        const htmlResponseRoomsList = `
-            <div class="form-group col-md-6">
-                ${roomCosts.length > 0 ? `
-                    <ul>
-                        ${roomCosts.map(room => `
-                            <div class="room">
-                                <img src="/assets/images/${room.image}" alt="${room.name}">
-                                <div class="room-name">${room.name}</div>
-                                <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
-                            </div>
-                        `).join('')}
-                    </ul>
-                ` : `
-                    <p>Nessuno dei calendari è disponibile nel periodo selezionato.</p>
-                `}
-            </div>
-        `;
-
-        const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
-        res.send(htmlResponse);
-
-
+    
+            // Modifica qui: genera l'URL di WordPress con i parametri
+            const wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form/'; // Sostituisci con l'URL effettivo della tua pagina WordPress
+            const htmlResponseRoomsList = `
+                <div class="form-group col-md-6">
+                    ${roomCosts.length > 0 ? `
+                        <ul>
+                            ${roomCosts.map(room => `
+                                <div class="room">
+                                    <img src="/assets/images/${room.image}" alt="${room.name}">
+                                    <div class="room-name">${room.name}</div>
+                                    <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}" class="btn btn-primary">Prenota ora</a>
+                                </div>
+                            `).join('')}
+                        </ul>
+                    ` : `
+                        <p>Nessuno dei calendari è disponibile nel periodo selezionato.</p>
+                    `}
+                </div>
+            `;
+    
+            const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
+            res.send(htmlResponse);
         } else {
             // Trova prossime disponibilità utilizzando la risposta di checkFreeBusy
             let alternativeAvailability = [];
