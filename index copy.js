@@ -34,14 +34,12 @@ const roomsImages = {
     "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "IrisOasis.jpg",
 };
 
-
 const translations_it = {
     "Disponibilità Villa Panorama": "Disponibilità Villa Panorama",
     "Costo totale per il periodo selezionato": "Costo totale per il periodo selezionato",
     "Camere disponibili nel periodo selezionato": "Camere disponibili nel periodo selezionato",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Nessuno dei calendari è disponibile nel periodo selezionato.",
-    "Periodi alternativi disponibili:" : "Periodi alternativi disponibili:",
-    "Richiesta prenotazione": "Richiesta prenotazione"
+    "Periodi alternativi disponibili:" : "Periodi alternativi disponibili:"
 };
 
 const translations_en = {
@@ -49,8 +47,8 @@ const translations_en = {
     "Costo totale per il periodo selezionato": "Total cost for the selected period",
     "Camere disponibili nel periodo selezionato": "Rooms available in the selected period",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "None of the calendars are available in the selected period.",
-    "Periodi alternativi disponibili:" : "Alternative periods available:",
-    "Richiesta prenotazione": "Booking request"    
+    "Periodi alternativi disponibili:" : "Alternative periods available:"
+
 };
   
 const translations_fr = {
@@ -58,8 +56,7 @@ const translations_fr = {
     "Costo totale per il periodo selezionato": "Coût total pour la période sélectionnée",
     "Camere disponibili nel periodo selezionato": "Chambres disponibles dans la période sélectionnée",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Aucun des calendriers n'est disponible dans la période sélectionnée.",
-    "Periodi alternativi disponibili:" : "Périodes alternatives disponibles:",
-    "Richiesta prenotazione": "Demande de réservation"
+    "Periodi alternativi disponibili:" : "Périodes alternatives disponibles:"
 };
 
 const translations_de = {
@@ -67,8 +64,7 @@ const translations_de = {
     "Costo totale per il periodo selezionato": "Gesamtkosten für den ausgewählten Zeitraum",
     "Camere disponibili nel periodo selezionato": "Zimmer verfügbar im ausgewählten Zeitraum",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Keiner der Kalender ist im ausgewählten Zeitraum verfügbar.",
-    "Periodi alternativi disponibili:" : "Alternative Zeiträume verfügbar:",
-    "Richiesta prenotazione": "Buchungsanfrage"
+    "Periodi alternativi disponibili:" : "Alternative Zeiträume verfügbar:"
 
 };
 
@@ -106,32 +102,7 @@ const htmlResponsePrefix = `
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
                     </svg>
                 </button>
-                <p><h4>`+translateText("Camere disponibili nel periodo selezionato")+`</h4></p>
-            </div>
-            <div class="row" style="padding-top: 50px; text-align: center;">
-                <div class="form-group col-md-3">
-                    &nbsp;
-                </div>
-`;
-const htmlResponsePrefixNoAvail = `
-    <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Disponibilità Villa Panorama</title>
-            <!-- Bootstrap CSS -->
-            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="assets/css/style.css">
-        </head>
-        <body class="container mt-5 body_bg">
-            <div class="header" style="padding-top: 50px;">
-                <button onclick="window.history.back()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                    </svg>
-                </button>
-                <p><h4>Nessuna Suite disponibile per l'intero periodo selezionato</h4></p>
+                <p>`+translateText("Camere disponibili nel periodo selezionato")+`</p>
             </div>
             <div class="row" style="padding-top: 50px; text-align: center;">
                 <div class="form-group col-md-3">
@@ -271,9 +242,7 @@ app.post('/freebusy', async (req, res) => {
                     totalCost
                 };
             }));
-
-            pets = formatPets(pets);
-
+    
             // Modifica qui: genera l'URL di WordPress con i parametri
             const htmlResponseRoomsList = `
                 <div class="form-group col-md-6">
@@ -284,7 +253,7 @@ app.post('/freebusy', async (req, res) => {
                                     <img src="/assets/images/${room.image}" alt="${room.name}">
                                     <div class="room-name">${room.name}</div>
                                     <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:")+` ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">`+translateText("Richiesta prenotazione")+`</a>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">Prenota ora</a>
                                 </div>
                             `).join('')}
                         </ul>
@@ -315,29 +284,21 @@ app.post('/freebusy', async (req, res) => {
             // Costruisci risposta HTML per periodi alternativi
             const htmlAlternativeResponse = `
                 <div class="form-group col-md-6">
-                    <h4>Periodi alternativi disponibili</h4>
+                    <h4>`+translateText("Periodi alternativi disponibili:")+`</h4>
                     <ul>
                         ${alternativeAvailability.map(room => `
                             <div class="room">
                                 <img src="/assets/images/${room.image}" alt="${room.name}">
                                 <div class="room-name">${room.name}</div>
-                                <ul style="font-weight: 300; list-style: none; font-size: smaller;">
+                                <ul style="font-weight: 300;">
                                     ${room.availablePeriods.map(period => {
                                         // Qui utilizziamo convertDate per formattare le date
                                         const formattedStartDate = convertDate(period.start);
                                         const formattedEndDate = convertDate(period.end);
-                                        pets = formatPets(pets);
                                         return `
-                                            <li style=" justify-content: space-between; display: flex; padding-top: 8px;">
-                                                <div>
-                                                    [${period.start} - ${period.end}]
-                                                </div> 
-                                                <div>
-                                                    <b>€ ${period.totalCost}</b>
-                                                </div>  
-                                                <div>
-                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">Seleziona</a>
-                                                </div>
+                                            <li>
+                                                [${formattedStartDate} - ${formattedEndDate}] <b>€ ${period.totalCost}</b> 
+                                                <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary">Prenota ora</a>
                                             </li>
                                         `;
                                     }).join('')}
@@ -348,7 +309,7 @@ app.post('/freebusy', async (req, res) => {
                 </div>
             `;
 
-            const htmlResponse = htmlResponsePrefixNoAvail + htmlAlternativeResponse + htmlResponsePostfix;
+            const htmlResponse = htmlResponsePrefix + htmlAlternativeResponse + htmlResponsePostfix;
 
             res.send(htmlResponse);
         }
@@ -419,19 +380,6 @@ function convertDate(inputDate) {
     return `${year}-${month}-${day}`;
 }
 
-function formatPets(pets) {
-
-    // return pets;
-
-    return (
-        pets === 'si' || 
-        pets === 'Si' || 
-        pets === 'Sì' || 
-        pets === 'sì' ||
-        pets === 'yes' ||
-        pets === 'Yes'
-    ) ? 'Si' : 'No';
-}
 
 app.get('/calendars', async (req, res) => {
     try {
