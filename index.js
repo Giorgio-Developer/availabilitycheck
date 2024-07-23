@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static(path.join(__dirname, 'assets'))); // Servire i file statici dalla cartella assets
 
 const googleCalendar = new GoogleCalendar();
+const wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form/'; // Sostituisci con l'URL effettivo della tua pagina WordPress
 
 // Array associativo per mappare gli ID dei calendari ai nomi delle stanze
 const roomsNames = {
@@ -193,7 +194,6 @@ app.post('/freebusy', async (req, res) => {
             }));
     
             // Modifica qui: genera l'URL di WordPress con i parametri
-            const wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form/'; // Sostituisci con l'URL effettivo della tua pagina WordPress
             const htmlResponseRoomsList = `
                 <div class="form-group col-md-6">
                     ${roomCosts.length > 0 ? `
@@ -220,16 +220,13 @@ app.post('/freebusy', async (req, res) => {
             let alternativeAvailability = [];
             for (const calendarId of calendarIds) {
                 const busyPeriods = freeBusyResponse[calendarId].busy;
-                const periods = findNextAvailablePeriods(busyPeriods, timeMin, timeMax);
+                const periods = await findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, children, pets, roomsNames[calendarId]);
                 if (periods.length > 0) {
                     alternativeAvailability.push({
                         calendarId: calendarId,
                         name: roomsNames[calendarId],
                         image: roomsImages[calendarId],
-                        availablePeriods: periods.map(period => ({
-                            start: formatDate(period.start),
-                            end: formatDate(period.end)
-                        }))
+                        availablePeriods: periods
                     });
                 }
             }
@@ -244,13 +241,24 @@ app.post('/freebusy', async (req, res) => {
                                 <img src="/assets/images/${room.image}" alt="${room.name}">
                                 <div class="room-name">${room.name}</div>
                                 <ul style="font-weight: 300;">
-                                    ${room.availablePeriods.map(period => `<li>Dal ${period.start} al ${period.end}</li>`).join('')}
+                                    ${room.availablePeriods.map(period => {
+                                        // Qui utilizziamo convertDate per formattare le date
+                                        const formattedStartDate = convertDate(period.start);
+                                        const formattedEndDate = convertDate(period.end);
+                                        return `
+                                            <li>
+                                                Dal ${formattedStartDate} al ${formattedEndDate} <b>€ ${period.totalCost}</b> 
+                                                <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary">Prenota ora</a>
+                                            </li>
+                                        `;
+                                    }).join('')}
                                 </ul>
                             </div>
                         `).join('')}
                     </ul>
                 </div>
             `;
+
             const htmlResponse = htmlResponsePrefix + htmlAlternativeResponse + htmlResponsePostfix;
 
             res.send(htmlResponse);
@@ -261,7 +269,7 @@ app.post('/freebusy', async (req, res) => {
     }
 });
 
-function findNextAvailablePeriods(busyPeriods, timeMin, timeMax) {
+async function findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, children, pets, roomName) {
     const availablePeriods = [];
 
     if (busyPeriods.length === 0) {
@@ -287,7 +295,16 @@ function findNextAvailablePeriods(busyPeriods, timeMin, timeMax) {
         availablePeriods.push({ start: busyPeriods[busyPeriods.length - 1].end, end: timeMax });
     }
 
-    return availablePeriods;
+    // Calcolo del costo totale per ciascun periodo disponibile
+    return Promise.all(availablePeriods.map(async period => {
+        const bookings = await BookingHelper.readCSV(`rooms_prices/${roomName}.csv`);
+        const totalCost = BookingHelper.calculateTotalCostV2(bookings, period.start, period.end, adults, children, pets);
+        return {
+            start: formatDate(period.start),
+            end: formatDate(period.end),
+            totalCost
+        };
+    }));
 }
 
 function formatDate(dateIsoString) {
@@ -296,6 +313,21 @@ function formatDate(dateIsoString) {
     let month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript conta i mesi da 0
     let year = date.getFullYear();
     return `${day}-${month}-${year}`;
+}
+
+function convertDate(inputDate) {
+    // Assumiamo che inputDate sia una stringa nel formato "dd-mm-yyyy"
+    const parts = inputDate.split('-'); // Dividiamo la stringa in parti basate sul separatore '-'
+    if (parts.length !== 3) {
+        throw new Error('Formato data non valido. Assicurati che sia "dd-mm-yyyy".');
+    }
+
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+
+    // Restituiamo una nuova stringa nel formato "yyyy-mm-dd"
+    return `${year}-${month}-${day}`;
 }
 
 
