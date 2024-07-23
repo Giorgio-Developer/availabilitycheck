@@ -217,7 +217,9 @@ app.post('/freebusy', async (req, res) => {
                     totalCost
                 };
             }));
-    
+
+            pets = formatPets(pets);
+
             // Modifica qui: genera l'URL di WordPress con i parametri
             const htmlResponseRoomsList = `
                 <div class="form-group col-md-6">
@@ -228,7 +230,7 @@ app.post('/freebusy', async (req, res) => {
                                     <img src="/assets/images/${room.image}" alt="${room.name}">
                                     <div class="room-name">${room.name}</div>
                                     <div class="room-cost">Costo totale per il periodo selezionato: ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">Prenota ora</a>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">Richiesta prenotazione</a>
                                 </div>
                             `).join('')}
                         </ul>
@@ -270,6 +272,7 @@ app.post('/freebusy', async (req, res) => {
                                         // Qui utilizziamo convertDate per formattare le date
                                         const formattedStartDate = convertDate(period.start);
                                         const formattedEndDate = convertDate(period.end);
+                                        pets = formatPets(pets);
                                         return `
                                             <li style=" justify-content: space-between; display: flex; padding-top: 8px;">
                                                 <div>
@@ -279,7 +282,7 @@ app.post('/freebusy', async (req, res) => {
                                                     <b>€ ${period.totalCost}</b>
                                                 </div>  
                                                 <div>
-                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">Invia richiesta</a>
+                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">Seleziona</a>
                                                 </div>
                                             </li>
                                         `;
@@ -362,6 +365,19 @@ function convertDate(inputDate) {
     return `${year}-${month}-${day}`;
 }
 
+function formatPets(pets) {
+
+    // return pets;
+
+    return (
+        pets === 'si' || 
+        pets === 'Si' || 
+        pets === 'Sì' || 
+        pets === 'sì' ||
+        pets === 'yes' ||
+        pets === 'Yes'
+    ) ? 'Si' : 'No';
+}
 
 app.get('/calendars', async (req, res) => {
     try {
