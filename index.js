@@ -42,7 +42,8 @@ const translations_it = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Nessuno dei calendari è disponibile nel periodo selezionato.",
     "Periodi alternativi disponibili" : "Periodi alternativi disponibili:",
     "Richiesta prenotazione": "Richiesta prenotazione",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Nessuna Suite disponibile per l'intero periodo selezionato"
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Nessuna Suite disponibile per l'intero periodo selezionato",
+    "Seleziona": "Seleziona"
 };
 
 const translations_en = {
@@ -52,7 +53,8 @@ const translations_en = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "None of the calendars are available in the selected period.",
     "Periodi alternativi disponibili" : "Alternative periods available:",
     "Richiesta prenotazione": "Booking request",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "No Suite available for the entire selected period"
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "No Suite available for the entire selected period",
+    "Seleziona": "Choose"
 };
   
 const translations_fr = {
@@ -62,7 +64,8 @@ const translations_fr = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Aucun des calendriers n'est disponible dans la période sélectionnée.",
     "Periodi alternativi disponibili" : "Périodes alternatives disponibles:",
     "Richiesta prenotazione": "Demande de réservation",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Aucune suite disponible pour toute la période sélectionnée"
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Aucune suite disponible pour toute la période sélectionnée",
+    "Seleziona": "Choisir"
 };
 
 const translations_de = {
@@ -72,8 +75,8 @@ const translations_de = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Keiner der Kalender ist im ausgewählten Zeitraum verfügbar.",
     "Periodi alternativi disponibili" : "Alternative Zeiträume verfügbar:",
     "Richiesta prenotazione": "Buchungsanfrage",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Keine Suite für den gesamten ausgewählten Zeitraum verfügbar"
-
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Keine Suite für den gesamten ausgewählten Zeitraum verfügbar",
+    "Seleziona": "Wählen"
 };
 
 const translations = {
@@ -188,39 +191,19 @@ app.post('/freebusy', async (req, res) => {
     const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
     const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
 
-    var htmlResponsePrefix = `
-    <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>`+translateText("Disponibilità Villa Panorama")+`</title>
-            <!-- Bootstrap CSS -->
-            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="assets/css/style.css">
-        </head>
-        <body class="container mt-5 body_bg">
-            <div class="header" style="padding-top: 50px;">
-                <button onclick="window.history.back()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                    </svg>
-                </button>
-                <p><h4>`+translateText("Camere disponibili nel periodo selezionato")+`</h4></p>
-            </div>
-            <div class="row" style="padding-top: 50px; text-align: center;">
-                <div class="form-group col-md-3">
-                    &nbsp;
-                </div>
-    `;
 
-    var htmlResponsePrefixNoAvail = `
+    try {
+        const oAuth2Client = await googleCalendar.authorize();
+        let { calendarIds, timeMin, timeMax, adults, children, pets, lang } = req.body;
+
+
+        var htmlResponsePrefix = `
         <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>`+translateText("Disponibilità Villa Panorama")+`</title>
+                <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
                 <!-- Bootstrap CSS -->
                 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="assets/css/style.css">
@@ -232,16 +215,39 @@ app.post('/freebusy', async (req, res) => {
                             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
                         </svg>
                     </button>
-                    <p><h4>`+translateText("Nessuna Suite disponibile per l'intero periodo selezionato")+`</h4></p>
+                    <p><h4>`+translateText("Camere disponibili nel periodo selezionato", lang)+`</h4></p>
                 </div>
                 <div class="row" style="padding-top: 50px; text-align: center;">
                     <div class="form-group col-md-3">
                         &nbsp;
                     </div>
-    `;
-    try {
-        const oAuth2Client = await googleCalendar.authorize();
-        let { calendarIds, timeMin, timeMax, adults, children, pets } = req.body;
+        `;
+    
+        var htmlResponsePrefixNoAvail = `
+            <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
+                    <!-- Bootstrap CSS -->
+                    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                    <link rel="stylesheet" href="assets/css/style.css">
+                </head>
+                <body class="container mt-5 body_bg">
+                    <div class="header" style="padding-top: 50px;">
+                        <button onclick="window.history.back()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                            </svg>
+                        </button>
+                        <p><h4>`+translateText("Nessuna Suite disponibile per l'intero periodo selezionato", lang)+`</h4></p>
+                    </div>
+                    <div class="row" style="padding-top: 50px; text-align: center;">
+                        <div class="form-group col-md-3">
+                            &nbsp;
+                        </div>
+        `;
 
         // Assicurati che calendarIds sia un array
         if (!Array.isArray(calendarIds)) {
@@ -293,13 +299,13 @@ app.post('/freebusy', async (req, res) => {
                                 <div class="room">
                                     <img src="/assets/images/${room.image}" alt="${room.name}">
                                     <div class="room-name">${room.name}</div>
-                                    <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:")+` ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">`+translateText("Richiesta prenotazione")+`</a>
+                                    <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</div>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
                                 </div>
                             `).join('')}
                         </ul>
                     ` : `
-                        <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.")+`</p>
+                        <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
                     `}
                 </div>
             `;
@@ -325,7 +331,7 @@ app.post('/freebusy', async (req, res) => {
             // Costruisci risposta HTML per periodi alternativi
             const htmlAlternativeResponse = `
                 <div class="form-group col-md-6">
-                    <h4>`+translateText("Periodi alternativi disponibili")+`</h4>
+                    <h4>`+translateText("Periodi alternativi disponibili", lang)+`</h4>
                     <ul>
                         ${alternativeAvailability.map(room => `
                             <div class="room">
@@ -346,7 +352,7 @@ app.post('/freebusy', async (req, res) => {
                                                     <b>€ ${period.totalCost}</b>
                                                 </div>  
                                                 <div>
-                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">Seleziona</a>
+                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona")+`</a>
                                                 </div>
                                             </li>
                                         `;
