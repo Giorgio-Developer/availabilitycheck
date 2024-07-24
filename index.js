@@ -89,10 +89,6 @@ const translations = {
 // Funzione per tradurre il testo in base alla lingua
 function translateText(text, lang = "en") {
 
-    console.log("text: ", text);
-    console.log("lang: ", lang);
-    console.log("translation: ", translations[lang][text]);
-
     if (translations[lang] && translations[lang][text]) {
         return translations[lang][text];
     }
