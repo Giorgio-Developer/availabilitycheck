@@ -37,38 +37,42 @@ const roomsImages = {
 
 const translations_it = {
     "Disponibilità Villa Panorama": "Disponibilità Villa Panorama",
-    "Costo totale per il periodo selezionato": "Costo totale per il periodo selezionato",
+    "Costo totale per il periodo selezionato:": "Costo totale per il periodo selezionato:",
     "Camere disponibili nel periodo selezionato": "Camere disponibili nel periodo selezionato",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Nessuno dei calendari è disponibile nel periodo selezionato.",
-    "Periodi alternativi disponibili:" : "Periodi alternativi disponibili:",
-    "Richiesta prenotazione": "Richiesta prenotazione"
+    "Periodi alternativi disponibili" : "Periodi alternativi disponibili:",
+    "Richiesta prenotazione": "Richiesta prenotazione",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Nessuna Suite disponibile per l'intero periodo selezionato"
 };
 
 const translations_en = {
     "Disponibilità Villa Panorama": "Villa Panorama Availability",
-    "Costo totale per il periodo selezionato": "Total cost for the selected period",
+    "Costo totale per il periodo selezionato:": "Total cost for the selected period",
     "Camere disponibili nel periodo selezionato": "Rooms available in the selected period",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "None of the calendars are available in the selected period.",
-    "Periodi alternativi disponibili:" : "Alternative periods available:",
-    "Richiesta prenotazione": "Booking request"    
+    "Periodi alternativi disponibili" : "Alternative periods available:",
+    "Richiesta prenotazione": "Booking request",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "No Suite available for the entire selected period"
 };
   
 const translations_fr = {
     "Disponibilità Villa Panorama": "Disponibilité Villa Panorama",
-    "Costo totale per il periodo selezionato": "Coût total pour la période sélectionnée",
+    "Costo totale per il periodo selezionato:": "Coût total pour la période sélectionnée",
     "Camere disponibili nel periodo selezionato": "Chambres disponibles dans la période sélectionnée",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Aucun des calendriers n'est disponible dans la période sélectionnée.",
-    "Periodi alternativi disponibili:" : "Périodes alternatives disponibles:",
-    "Richiesta prenotazione": "Demande de réservation"
+    "Periodi alternativi disponibili" : "Périodes alternatives disponibles:",
+    "Richiesta prenotazione": "Demande de réservation",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Aucune suite disponible pour toute la période sélectionnée"
 };
 
 const translations_de = {
     "Disponibilità Villa Panorama": "Villa Panorama Verfügbarkeit",
-    "Costo totale per il periodo selezionato": "Gesamtkosten für den ausgewählten Zeitraum",
+    "Costo totale per il periodo selezionato:": "Gesamtkosten für den ausgewählten Zeitraum",
     "Camere disponibili nel periodo selezionato": "Zimmer verfügbar im ausgewählten Zeitraum",
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Keiner der Kalender ist im ausgewählten Zeitraum verfügbar.",
-    "Periodi alternativi disponibili:" : "Alternative Zeiträume verfügbar:",
-    "Richiesta prenotazione": "Buchungsanfrage"
+    "Periodi alternativi disponibili" : "Alternative Zeiträume verfügbar:",
+    "Richiesta prenotazione": "Buchungsanfrage",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Keine Suite für den gesamten ausgewählten Zeitraum verfügbar"
 
 };
 
@@ -81,63 +85,18 @@ const translations = {
 
 // Funzione per tradurre il testo in base alla lingua
 function translateText(text, lang = "en") {
-    // let lang = encodeURIComponent(req.query.lang);
+
+    console.log("text: ", text);
+    console.log("lang: ", lang);
+    console.log("translation: ", translations[lang][text]);
+
     if (translations[lang] && translations[lang][text]) {
         return translations[lang][text];
     }
     return text;
 }
 
-const htmlResponsePrefix = `
-    <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>`+translateText("Disponibilità Villa Panorama")+`</title>
-            <!-- Bootstrap CSS -->
-            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="assets/css/style.css">
-        </head>
-        <body class="container mt-5 body_bg">
-            <div class="header" style="padding-top: 50px;">
-                <button onclick="window.history.back()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                    </svg>
-                </button>
-                <p><h4>`+translateText("Camere disponibili nel periodo selezionato")+`</h4></p>
-            </div>
-            <div class="row" style="padding-top: 50px; text-align: center;">
-                <div class="form-group col-md-3">
-                    &nbsp;
-                </div>
-`;
-const htmlResponsePrefixNoAvail = `
-    <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Disponibilità Villa Panorama</title>
-            <!-- Bootstrap CSS -->
-            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="assets/css/style.css">
-        </head>
-        <body class="container mt-5 body_bg">
-            <div class="header" style="padding-top: 50px;">
-                <button onclick="window.history.back()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                    </svg>
-                </button>
-                <p><h4>Nessuna Suite disponibile per l'intero periodo selezionato</h4></p>
-            </div>
-            <div class="row" style="padding-top: 50px; text-align: center;">
-                <div class="form-group col-md-3">
-                    &nbsp;
-                </div>
-`;
+
 
 const htmlResponsePostfix = `
             <div class="form-group col-md-3">
@@ -229,6 +188,57 @@ app.post('/freebusy', async (req, res) => {
     const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
     const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
 
+    var htmlResponsePrefix = `
+    <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>`+translateText("Disponibilità Villa Panorama")+`</title>
+            <!-- Bootstrap CSS -->
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="assets/css/style.css">
+        </head>
+        <body class="container mt-5 body_bg">
+            <div class="header" style="padding-top: 50px;">
+                <button onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                    </svg>
+                </button>
+                <p><h4>`+translateText("Camere disponibili nel periodo selezionato")+`</h4></p>
+            </div>
+            <div class="row" style="padding-top: 50px; text-align: center;">
+                <div class="form-group col-md-3">
+                    &nbsp;
+                </div>
+    `;
+
+    var htmlResponsePrefixNoAvail = `
+        <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>`+translateText("Disponibilità Villa Panorama")+`</title>
+                <!-- Bootstrap CSS -->
+                <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="assets/css/style.css">
+            </head>
+            <body class="container mt-5 body_bg">
+                <div class="header" style="padding-top: 50px;">
+                    <button onclick="window.history.back()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        </svg>
+                    </button>
+                    <p><h4>`+translateText("Nessuna Suite disponibile per l'intero periodo selezionato")+`</h4></p>
+                </div>
+                <div class="row" style="padding-top: 50px; text-align: center;">
+                    <div class="form-group col-md-3">
+                        &nbsp;
+                    </div>
+    `;
     try {
         const oAuth2Client = await googleCalendar.authorize();
         let { calendarIds, timeMin, timeMax, adults, children, pets } = req.body;
@@ -315,7 +325,7 @@ app.post('/freebusy', async (req, res) => {
             // Costruisci risposta HTML per periodi alternativi
             const htmlAlternativeResponse = `
                 <div class="form-group col-md-6">
-                    <h4>Periodi alternativi disponibili</h4>
+                    <h4>`+translateText("Periodi alternativi disponibili")+`</h4>
                     <ul>
                         ${alternativeAvailability.map(room => `
                             <div class="room">
