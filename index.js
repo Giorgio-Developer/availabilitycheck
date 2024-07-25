@@ -186,12 +186,6 @@ app.post('/freebusy', async (req, res) => {
 
     let wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form'; // Sostituisci con l'URL effettivo della tua pagina WordPress
 
-    if(req.body.lang && req.body.lang !== 'it') {
-        wordpressBaseUrl = wordpressBaseUrl + '-' + req.body.lang+"/";
-    } else {
-        wordpressBaseUrl = wordpressBaseUrl + "/";
-    }
-
     const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
     const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
 
@@ -199,6 +193,11 @@ app.post('/freebusy', async (req, res) => {
         const oAuth2Client = await googleCalendar.authorize();
         let { calendarIds, timeMin, timeMax, adults, children, pets, lang } = req.body;
 
+        if(lang != "" && lang != "it") {
+            wordpressBaseUrl = wordpressBaseUrl + '-' + req.body.lang+"/";
+        } else {
+            wordpressBaseUrl = wordpressBaseUrl + "/";
+        }
 
         var htmlResponsePrefix = `
         <!DOCTYPE html>
