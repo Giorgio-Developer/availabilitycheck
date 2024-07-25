@@ -13,7 +13,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static(path.join(__dirname, 'assets'))); // Servire i file statici dalla cartella assets
 
 const googleCalendar = new GoogleCalendar();
-const wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form/'; // Sostituisci con l'URL effettivo della tua pagina WordPress
 
 // Array associativo per mappare gli ID dei calendari ai nomi delle stanze
 const roomsNames = {
@@ -184,9 +183,17 @@ app.post('/events', async (req, res) => {
 });
 
 app.post('/freebusy', async (req, res) => {
+
+    let wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form'; // Sostituisci con l'URL effettivo della tua pagina WordPress
+
+    if(req.body.lang && req.body.lang !== 'it') {
+        wordpressBaseUrl = wordpressBaseUrl + '-' + req.body.lang+"/";
+    } else {
+        wordpressBaseUrl = wordpressBaseUrl + "/";
+    }
+
     const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
     const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
-
 
     try {
         const oAuth2Client = await googleCalendar.authorize();
@@ -296,7 +303,7 @@ app.post('/freebusy', async (req, res) => {
                                     <img src="/assets/images/${room.image}" alt="${room.name}">
                                     <div class="room-name">${room.name}</div>
                                     <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
                                 </div>
                             `).join('')}
                         </ul>
@@ -348,7 +355,7 @@ app.post('/freebusy', async (req, res) => {
                                                     <b>€ ${period.totalCost}</b>
                                                 </div>  
                                                 <div>
-                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona")+`</a>
+                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona")+`</a>
                                                 </div>
                                             </li>
                                         `;
