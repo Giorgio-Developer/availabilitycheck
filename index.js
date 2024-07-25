@@ -207,7 +207,7 @@ app.post('/freebusy', async (req, res) => {
         // Se lang è una delle lingue supportate, usa quella, altrimenti usa 'en' 
         if(lang != "" && lang != "it") {
             if(lang == "en" || lang == "fr" || lang == "de") {
-                wordpressBaseUrl = wordpressBaseUrl + '-' + req.body.lang+"/";
+                wordpressBaseUrl = wordpressBaseUrl + '-' + lang+"/";
             } else {
                 wordpressBaseUrl = wordpressBaseUrl + "en/";
             }
