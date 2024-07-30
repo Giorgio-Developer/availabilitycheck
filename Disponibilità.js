@@ -10,12 +10,25 @@ document.addEventListener('DOMContentLoaded', function() {
         var timeMax = document.getElementById('timeMax').value;
         
         var errorMessage = '';
+        var userLang = navigator.language || navigator.userLanguage;
 
-		if (!timeMin || !timeMax) {
-			errorMessage += 'Le date di check-in e check-out sono obbligatorie.\nCheck-in and check-out dates are mandatory.\n';
-		} else if (new Date(timeMin) >= new Date(timeMax)) {
-			errorMessage += 'La data di check-out deve essere successiva alla data di check-in.\nThe check-out date must be later than the check-in date.\n';
-		}
+        if (!timeMin || !timeMax) {
+            if (userLang.startsWith('it')) {
+                errorMessage += 'Le date di check-in e check-out sono obbligatorie.\n';
+            } else if (userLang.startsWith('fr')) {
+                errorMessage += 'Les dates de check-in et check-out sont obligatoires.\n';
+            } else {
+                errorMessage += 'Check-in and check-out dates are mandatory.\n';
+            }
+        } else if (new Date(timeMin) >= new Date(timeMax)) {
+            if (userLang.startsWith('it')) {
+                errorMessage += 'La data di check-out deve essere successiva alla data di check-in.\n';
+            } else if (userLang.startsWith('fr')) {
+                errorMessage += 'La date de check-out doit être postérieure à la date de check-in.\n';
+            } else {
+                errorMessage += 'The check-out date must be later than the check-in date.\n';
+            }
+        }
 
 
         if (errorMessage) {
