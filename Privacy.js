@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Seleziona il modulo
     var form = document.querySelector('.wpcf7-form');
 
-       if(!form)
+    if (!form)
         return;
-   
+
     // Seleziona la checkbox della privacy
     var privacyCheckbox = form.querySelector('input[name="Privacy[]"]');
 
@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var messages = {
         'it': "È necessario accettare la privacy policy.",
         'fr': "Vous devez accepter la politique de confidentialité.",
-        'en': "You need to accept the privacy policy."
+        'en': "You need to accept the privacy policy.",
+        'de': "Sie müssen die Datenschutzrichtlinie akzeptieren."
     };
 
     // Seleziona il messaggio in base alla lingua del browser
@@ -24,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMessageText = messages['it'];
     } else if (userLang.startsWith('fr')) {
         errorMessageText = messages['fr'];
+    } else if (userLang.startsWith('de')) {
+        errorMessageText = messages['de'];
     }
 
     // Aggiungi un listener sull'evento di submit

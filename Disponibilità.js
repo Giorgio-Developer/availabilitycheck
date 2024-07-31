@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMessage += 'Le date di check-in e check-out sono obbligatorie.\n';
             } else if (userLang.startsWith('fr')) {
                 errorMessage += 'Les dates de check-in et check-out sont obligatoires.\n';
+            } else if (userLang.startsWith('de')) {
+                errorMessage += 'Check-in- und Check-out-Daten sind erforderlich.\n';
             } else {
                 errorMessage += 'Check-in and check-out dates are mandatory.\n';
             }
@@ -25,11 +27,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMessage += 'La data di check-out deve essere successiva alla data di check-in.\n';
             } else if (userLang.startsWith('fr')) {
                 errorMessage += 'La date de check-out doit être postérieure à la date de check-in.\n';
+            } else if (userLang.startsWith('de')) {
+                errorMessage += 'Das Check-out-Datum muss nach dem Check-in-Datum liegen.\n';
             } else {
                 errorMessage += 'The check-out date must be later than the check-in date.\n';
             }
         }
-
 
         if (errorMessage) {
             event.preventDefault();
