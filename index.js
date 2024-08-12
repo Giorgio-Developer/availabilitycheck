@@ -408,12 +408,8 @@ app.post('/freebusy', async (req, res) => {
                 <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
                 <!-- Bootstrap CSS -->
                 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="assets/css/style.css">
-
-                `
-                +topNavigationBarCSS+
-                `
-
+                <link rel="stylesheet" href="assets/css/style.css">`
+                +topNavigationBarCSS+`
             </head>
             <body class="body_bg">`
             +topNavigationBar+
@@ -529,24 +525,48 @@ app.post('/freebusy', async (req, res) => {
             pets = formatPets(pets);
 
             // Modifica qui: genera l'URL di WordPress con i parametri
+            // const htmlResponseRoomsList = `
+            //     <div class="form-group col-md-6">
+            //         ${roomCosts.length > 0 ? `
+            //             <ul>
+            //                 ${roomCosts.map(room => `
+            //                     <div class="room">
+            //                         <img src="/assets/images/${room.image}" alt="${room.name}">
+            //                         <div class="room-name">${room.name}</div>
+            //                         <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</div>
+            //                         <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+            //                     </div>
+            //                 `).join('')}
+            //             </ul>
+            //         ` : `
+            //             <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
+            //         `}
+            //     </div>
+            // `;
+
             const htmlResponseRoomsList = `
-                <div class="form-group col-md-6">
-                    ${roomCosts.length > 0 ? `
-                        <ul>
-                            ${roomCosts.map(room => `
-                                <div class="room">
-                                    <img src="/assets/images/${room.image}" alt="${room.name}">
-                                    <div class="room-name">${room.name}</div>
-                                    <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</div>
-                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+            <div class="form-group col-md-12">
+                ${roomCosts.length > 0 ? `
+                    <ul class="row list-unstyled" style="margin: 20px;">
+                        ${roomCosts.map(room => `
+                            <li class="col-md-4 d-flex mb-4">
+                                <div class="room card w-100">
+                                    <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                    <div class="card-body">
+                                        <h5 class="room-name card-title">${room.name}</h5>
+                                        <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
+                                        <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+                                    </div>
                                 </div>
-                            `).join('')}
-                        </ul>
-                    ` : `
-                        <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
-                    `}
-                </div>
-            `;
+                            </li>
+                        `).join('')}
+                    </ul>
+                ` : `
+                    <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
+                `}
+            </div>
+        `;
+        
     
             const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
             res.send(htmlResponse);
