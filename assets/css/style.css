@@ -5,10 +5,11 @@
     background-size: cover;
     color: white;
 
-    /*font-family: Georgia, 'Times New Roman', Times, serif;*/
-	font-family: 'Roboto';
-    font-size: medium;
-    font-weight: 800;
+	/* font-family: 'Roboto'; */
+    /* font-size: medium;
+    font-weight: 800; */
+
+    font: normal 400 19px / 25px "Playfair Display", Helvetica, Arial, Verdana, sans-serif !important;
 	
 	height: 100vh !important;
 }
@@ -76,6 +77,7 @@
     padding: 8px;
     width: 100%;
     margin-bottom: 10px;
+    /* font-family: 'Roboto'; */
 }
 
 .room img {

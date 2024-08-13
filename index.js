@@ -162,8 +162,9 @@ app.post('/freebusy', async (req, res) => {
                 <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
                 <!-- Bootstrap CSS -->
                 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="assets/css/style.css">`
-                +topNavigationBarCSS+topNavBarJS+`
+                <link rel="stylesheet" href="assets/css/style.css">
+                <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+                `+topNavigationBarCSS+topNavBarJS+`
             </head>
             <body class="body_bg">`
             +topNavigationBar+
@@ -202,7 +203,7 @@ app.post('/freebusy', async (req, res) => {
                     <!-- Bootstrap CSS -->
                     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
                     <link rel="stylesheet" href="assets/css/style.css">
-
+                    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
                     `
                         +topNavigationBarCSS+topNavBarJS+
                     `
