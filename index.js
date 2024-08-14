@@ -279,26 +279,6 @@ app.post('/freebusy', async (req, res) => {
 
             pets = formatPets(pets);
 
-            // Modifica qui: genera l'URL di WordPress con i parametri
-            // const htmlResponseRoomsList = `
-            //     <div class="form-group col-md-6">
-            //         ${roomCosts.length > 0 ? `
-            //             <ul>
-            //                 ${roomCosts.map(room => `
-            //                     <div class="room">
-            //                         <img src="/assets/images/${room.image}" alt="${room.name}">
-            //                         <div class="room-name">${room.name}</div>
-            //                         <div class="room-cost">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</div>
-            //                         <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
-            //                     </div>
-            //                 `).join('')}
-            //             </ul>
-            //         ` : `
-            //             <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
-            //         `}
-            //     </div>
-            // `;
-
             const htmlResponseRoomsList = `
             <div class="form-group col-md-12">
                 ${roomCosts.length > 0 ? `
@@ -343,50 +323,55 @@ app.post('/freebusy', async (req, res) => {
 
             // Costruisci risposta HTML per periodi alternativi
             const htmlAlternativeResponse = `
-                <div class="form-group col-md-6">
-                    <h4
-                        style="
-                            margin-top: 20px; 
-                            padding: 10px 20px; 
-                            background-color: #007BFF; 
-                            color: white; 
-                            border-radius: 5px; 
-                            background-color: #11223355; 
-                            border: 1px solid lightgray;
-                    ">`+translateText("Periodi alternativi disponibili", lang)+`</h4>
-                    <ul style="
-                            padding-left: 0px;
-                        ">
-                        ${alternativeAvailability.map(room => `
-                            <div class="room">
-                                <img src="/assets/images/${room.image}" alt="${room.name}">
-                                <div class="room-name">${room.name}</div>
-                                <ul style="font-weight: 300; list-style: none; font-size: smaller;">
-                                    ${room.availablePeriods.map(period => {
-                                        // Qui utilizziamo convertDate per formattare le date
-                                        const formattedStartDate = convertDate(period.start);
-                                        const formattedEndDate = convertDate(period.end);
-                                        pets = formatPets(pets);
-                                        return `
-                                            <li style=" justify-content: space-between; display: flex; padding-top: 8px;">
-                                                <div>
-                                                    [${period.start} - ${period.end}]
-                                                </div> 
-                                                <div>
-                                                    <b>€ ${period.totalCost}</b>
-                                                </div>  
-                                                <div>
-                                                    <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona", lang)+`</a>
-                                                </div>
-                                            </li>
-                                        `;
-                                    }).join('')}
-                                </ul>
-                            </div>
-                        `).join('')}
-                    </ul>
+                <div class="pl-5 pr-5">
+                    <div class="form-group col-md-12">
+                        <h4
+                            style="
+                                margin-top: 20px; 
+                                padding: 10px 20px; 
+                                background-color: #007BFF; 
+                                color: white; 
+                                border-radius: 5px; 
+                                background-color: #11223355; 
+                                border: 1px solid lightgray;
+                        ">`+translateText("Periodi alternativi disponibili", lang)+`</h4>
+                        <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
+                            ${alternativeAvailability.map((room, index) => `
+                                <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
+                                    <div class="room card w-100">
+                                        <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                        <div class="card-body">
+                                            <h5 class="room-name card-title">${room.name}</h5>
+                                            <ul class="list-unstyled" style="font-weight: 300; font-size: smaller;">
+                                                ${room.availablePeriods.map(period => {
+                                                    // Qui utilizziamo convertDate per formattare le date
+                                                    const formattedStartDate = convertDate(period.start);
+                                                    const formattedEndDate = convertDate(period.end);
+                                                    pets = formatPets(pets);
+                                                    return `
+                                                        <li class="d-flex justify-content-between align-items-center py-2">
+                                                            <div>
+                                                                [${period.start} - ${period.end}]
+                                                            </div> 
+                                                            <div>
+                                                                <b>€ ${period.totalCost}</b>
+                                                            </div>  
+                                                            <div>
+                                                                <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona", lang)+`</a>
+                                                            </div>
+                                                        </li>
+                                                    `;
+                                                }).join('')}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
                 </div>
             `;
+
 
             const htmlResponse = htmlResponsePrefixNoAvail + htmlAlternativeResponse + htmlResponsePostfix;
 
