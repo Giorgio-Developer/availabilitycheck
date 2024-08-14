@@ -27,7 +27,7 @@ const translations_it = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Nessuno dei calendari è disponibile nel periodo selezionato.",
     "Periodi alternativi disponibili": "Periodi alternativi disponibili:",
     "Richiesta prenotazione": "Richiesta prenotazione",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Nessuna Suite disponibile per l'intero periodo selezionato",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Ecco le stanze disponibili con periodi più vicini alle date richieste",
     "Seleziona": "Seleziona"
 };
 
@@ -38,7 +38,7 @@ const translations_en = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "None of the calendars are available in the selected period.",
     "Periodi alternativi disponibili": "Alternative periods available:",
     "Richiesta prenotazione": "Booking request",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "No Suite available for the entire selected period",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Here are the available rooms closest to the requested dates",
     "Seleziona": "Choose"
 };
 
@@ -49,7 +49,7 @@ const translations_fr = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Aucun des calendriers n'est disponible dans la période sélectionnée.",
     "Periodi alternativi disponibili": "Périodes alternatives disponibles:",
     "Richiesta prenotazione": "Demande de réservation",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Aucune suite disponible pour toute la période sélectionnée",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Voici les chambres disponibles les plus proches des dates demandées",
     "Seleziona": "Choisir"
 };
 
@@ -60,7 +60,7 @@ const translations_de = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Keiner der Kalender ist im ausgewählten Zeitraum verfügbar.",
     "Periodi alternativi disponibili": "Alternative Zeiträume verfügbar:",
     "Richiesta prenotazione": "Buchungsanfrage",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Keine Suite für den gesamten ausgewählten Zeitraum verfügbar",
+    "Nessuna Suite disponibile per l'intero periodo selezionato": "Hier sind die verfügbaren Zimmer, die am nächsten zu den gewünschten Terminen liegen",
     "Seleziona": "Wählen"
 };
 

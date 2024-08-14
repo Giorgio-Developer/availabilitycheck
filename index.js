@@ -213,14 +213,14 @@ app.post('/freebusy', async (req, res) => {
                 `
                     +topNavigationBar+
                 `
-                    <div class="header" style="padding-top: 50px;">
-                        <button onclick="window.history.back()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                            </svg>
-                        </button>
-                        <p>
-                            <h4  style="
+                    <div class="header" style="padding-top: 50px;">`+
+                        // `<button onclick="window.history.back()">
+                        //     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        //         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        //     </svg>
+                        // </button>`+
+                        `<p>`+
+                            `<h4  style="
                                 margin-top: 20px; 
                                 padding: 10px 20px; 
                                 background-color: #007BFF; 
@@ -229,8 +229,8 @@ app.post('/freebusy', async (req, res) => {
                                 background-color: #11223355; 
                                 border: 1px solid lightgray;
                                 ">`+translateText("Nessuna Suite disponibile per l'intero periodo selezionato", lang)+`
-                            </h4>
-                        </p>
+                            </h4>`+
+                        `</p>
                     </div>
                     <div class="row" style="padding-top: 50px; text-align: center;">
                         <div class="form-group col-md-3">
@@ -325,17 +325,18 @@ app.post('/freebusy', async (req, res) => {
             const htmlAlternativeResponse = `
                 <div class="pl-5 pr-5">
                     <div class="form-group col-md-12">
-                        <h4
-                            style="
-                                margin-top: 20px; 
-                                padding: 10px 20px; 
-                                background-color: #007BFF; 
-                                color: white; 
-                                border-radius: 5px; 
-                                background-color: #11223355; 
-                                border: 1px solid lightgray;
-                        ">`+translateText("Periodi alternativi disponibili", lang)+`</h4>
-                        <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
+                    `+
+                        // `<h4
+                        //     style="
+                        //         margin-top: 20px; 
+                        //         padding: 10px 20px; 
+                        //         background-color: #007BFF; 
+                        //         color: white; 
+                        //         border-radius: 5px; 
+                        //         background-color: #11223355; 
+                        //         border: 1px solid lightgray;
+                        // ">`+translateText("Periodi alternativi disponibili", lang)+`</h4>`+
+                        `<ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
                             ${alternativeAvailability.map((room, index) => `
                                 <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
                                     <div class="room card w-100">
