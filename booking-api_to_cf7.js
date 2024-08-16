@@ -98,7 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
         priceInput.value = price;
 
         let priceText = document.getElementById('priceText');
-        priceText.innerHTML =  price+" €";
+        priceText.innerHTML =  price + " €";
+
+        let anticipoInput = document.getElementById('anticipo');
+        let anticipo = (price * 0.30);
+        anticipoInput.value = anticipo;
+
+        let saldoInput = document.getElementById('saldo');
+        let saldo = (price * 0.70);
+        saldoInput.value = saldo;
+
     }
 
 });
