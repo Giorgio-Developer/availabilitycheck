@@ -352,7 +352,7 @@ app.post('/freebusy', async (req, res) => {
                                                     return `
                                                         <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
                                                             <div>
-                                                                [${period.start} - ${period.end}]
+                                                                ${period.start} - ${period.end}
                                                             </div> 
                                                             <div style="font-size: larger;">
                                                                 <b>€ ${period.totalCost}</b>
