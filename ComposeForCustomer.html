@@ -1,0 +1,37 @@
+const mailtoLink = senderEmail ? `mailto:${senderEmail}?cc=cat@idea-srl.eu&subject=RE: Idea Catamaran&body=${urlEncodedResponse}` : `mailto:?cc=cat@idea-srl.eu&subject=RE: Idea Catamaran&body=${urlEncodedResponse}`;
+const htmlFormattato = `
+<style>
+.button-style {
+padding: 15px 25px;
+background-color: #007bff;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+display: inline-block;
+margin: 20px 0;
+}
+.email-content {
+font-family: Arial, sans-serif;
+line-height: 1.5;
+}
+.email-header {
+margin-bottom: 20px;
+background-color: #f0f0f0;
+padding: 10px;
+border-radius: 5px;
+}
+.email-response {
+margin-top: 20px;
+}
+</style>
+<div class="email-content">
+<a href="${mailtoLink}" class="button-style"><strong>Componi mail per il cliente →</strong></a>
+<div class="email-header">
+<strong>Mail originale:</strong> ${formattedEmail}
+</div>
+<div class="email-response">
+<strong>RISPOSTA SOFIA:</strong>
+<br><br>
+${gptResponse.replace(/\n/g, '</p><p>')}
+</div>
+</div>`;

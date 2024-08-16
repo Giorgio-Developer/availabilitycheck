@@ -280,27 +280,27 @@ app.post('/freebusy', async (req, res) => {
             pets = formatPets(pets);
 
             const htmlResponseRoomsList = `
-            <div class="form-group col-md-12">
-                ${roomCosts.length > 0 ? `
-                    <ul class="row list-unstyled" style="margin: 20px;">
-                        ${roomCosts.map(room => `
-                            <li class="col-md-4 d-flex mb-4">
-                                <div class="room card w-100">
-                                    <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
-                                    <div class="card-body">
-                                        <h5 class="room-name card-title">${room.name}</h5>
-                                        <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
-                                        <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+                <div class="form-group col-md-12">
+                    ${roomCosts.length > 0 ? `
+                        <ul class="row list-unstyled" style="margin: 20px;">
+                            ${roomCosts.map(room => `
+                                <li class="col-md-4 d-flex mb-4">
+                                    <div class="room card w-100">
+                                        <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                        <div class="card-body">
+                                            <h5 class="room-name card-title">${room.name}</h5>
+                                            <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
+                                            <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                ` : `
-                    <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
-                `}
-            </div>
-        `;
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : `
+                        <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
+                    `}
+                </div>
+            `;
         
     
             const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
@@ -350,14 +350,14 @@ app.post('/freebusy', async (req, res) => {
                                                     const formattedEndDate = convertDate(period.end);
                                                     pets = formatPets(pets);
                                                     return `
-                                                        <li class="d-flex justify-content-between align-items-center py-2">
+                                                        <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
                                                             <div>
                                                                 [${period.start} - ${period.end}]
                                                             </div> 
-                                                            <div>
+                                                            <div style="font-size: larger;">
                                                                 <b>€ ${period.totalCost}</b>
                                                             </div>  
-                                                            <div>
+                                                            <div style="padding: 10px;">
                                                                 <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona", lang)+`</a>
                                                             </div>
                                                         </li>
