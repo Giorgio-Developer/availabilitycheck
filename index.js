@@ -128,17 +128,20 @@ app.post('/freebusy', async (req, res) => {
     try {
         const oAuth2Client = await googleCalendar.authorize();
         // let { calendarIds, timeMin, timeMax, adults, children, pets, lang } = req.body;
-        let { calendarIds, timeMin, timeMax, adults, children, pets } = req.body;
-
+        let { calendarIds, timeMin, timeMax, adults, children, pets, lang } = req.body;
 
         // Prendi l'header 'Accept-Language' e scegli la prima lingua
-        let lang = req.headers['accept-language'];
+        let lang_headers = req.headers['accept-language'];
+
+        if(lang == undefined || lang == "" ) {
+            lang = lang_headers;
+        }
+
         if (lang) {
             lang = lang.split(',')[0].split('-')[0]; // Restituisce solo il codice della lingua principale, es. 'en' da 'en-US,en;q=0.9'
         } else {
             lang = 'it'; // Imposta un valore di default se l'header non è disponibile
         }
-
 
         // Se lang è una delle lingue supportate, usa quella, altrimenti usa 'en' 
         if(lang != "" && lang != "it") {
