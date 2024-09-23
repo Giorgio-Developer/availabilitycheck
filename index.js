@@ -273,6 +273,8 @@ app.post('/freebusy', async (req, res) => {
         if (availableCalendars.length > 0) {
             const roomCosts = await Promise.all(availableCalendars.map(async room => {
                 const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
+
+                // Calcola il costo totale per il periodo selezionato
                 const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
                 return {
                     ...room,
@@ -282,30 +284,61 @@ app.post('/freebusy', async (req, res) => {
 
             pets = formatPets(pets);
 
+            // const htmlResponseRoomsList = `
+            //     <div class="form-group col-md-12">
+            //         ${roomCosts.length > 0 ? `
+            //             <ul class="row list-unstyled" style="margin: 20px;">
+            //                 ${roomCosts.map(room => `
+            //                     <li class="col-md-4 d-flex mb-4">
+            //                         <div class="room card w-100">
+            //                             <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+            //                             <div class="card-body">
+            //                                 <h5 class="room-name card-title">${room.name}</h5>
+            //                                 <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
+            //                                 <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
+            //                             </div>
+            //                         </div>
+            //                     </li>
+            //                 `).join('')}
+            //             </ul>
+            //         ` : `
+            //             <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
+            //         `}
+            //     </div>
+            // `;
+
             const htmlResponseRoomsList = `
-                <div class="form-group col-md-12">
-                    ${roomCosts.length > 0 ? `
-                        <ul class="row list-unstyled" style="margin: 20px;">
-                            ${roomCosts.map(room => `
-                                <li class="col-md-4 d-flex mb-4">
-                                    <div class="room card w-100">
-                                        <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
-                                        <div class="card-body">
-                                            <h5 class="room-name card-title">${room.name}</h5>
-                                            <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
-                                            <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
-                                        </div>
+            <div class="form-group col-md-12">
+                ${roomCosts.length > 0 ? `
+                    <ul class="row list-unstyled" style="margin: 20px;">
+                        ${roomCosts.map(room => `
+                            <li class="col-md-4 d-flex mb-4">
+                                <div class="room card w-100">
+                                    <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                    <div class="card-body">
+                                        <h5 class="room-name card-title">${room.name}</h5>
+                                        <p class="room-cost card-text">
+                                            ${room.totalCost === "Error in cost calculation"
+                                                ? translateText("Per il preventivo contattare booking@villapanoramasuite.it", lang)
+                                                : translateText("Costo totale per il periodo selezionato:", lang) + ` ${room.totalCost} €`
+                                            }
+                                        </p>
+                                        ${room.totalCost !== "Error in cost calculation" ? `
+                                        <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">
+                                            ` + translateText("Richiesta prenotazione", lang) + `
+                                        </a>
+                                        ` : ``}
                                     </div>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    ` : `
-                        <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
-                    `}
-                </div>
-            `;
-        
-    
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                ` : `
+                    <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
+                `}
+            </div>
+        `;
+
             const htmlResponse = htmlResponsePrefix + htmlResponseRoomsList + htmlResponsePostfix;
             res.send(htmlResponse);
         } else {
@@ -352,6 +385,22 @@ app.post('/freebusy', async (req, res) => {
                                                     const formattedStartDate = convertDate(period.start);
                                                     const formattedEndDate = convertDate(period.end);
                                                     pets = formatPets(pets);
+
+                                                    // Previene l'errore se il costo totale non può essere calcolato
+                                                    if(period.totalCost == "Error in cost calculation") {
+                                                        return `
+                                                        <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
+                                                            <div>
+                                                                ${period.start} - ${period.end}
+                                                            </div> 
+                                                            <div style="font-size: larger;">
+                                                                <br>
+                                                                <b>Richiedere il preventivo tramite email all'indirizzo booking@villapanoramasuite.it</b>
+                                                            </div>  
+                                                        </li>
+                                                    `;
+                                                    }
+
                                                     return `
                                                         <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
                                                             <div>
