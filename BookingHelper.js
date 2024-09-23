@@ -34,8 +34,8 @@ class BookingHelper {
         while (currentDate.isSameOrBefore(lastDate)) {
 
             const booking = bookings.find(booking => {
-                const start = moment(booking['data inizio'], 'DD/MM/YY');
-                const end = moment(booking['data fine'], 'DD/MM/YY');
+                const start = moment(booking['data inizio'], ['DD/MM/YY', 'DD/MM/YYYY'], true);
+                const end = moment(booking['data fine'], ['DD/MM/YY', 'DD/MM/YYYY'], true);
                 return currentDate.isBetween(start, end, null, '[]');
             });
 
@@ -46,6 +46,10 @@ class BookingHelper {
                 if(adults > 2){
                     totalCost += costo_extra_adulti * (adults - 2);
                 }
+            } else {
+            
+                return "Error in cost calculation";
+            
             }
             currentDate.add(1, 'days'); // Passa al giorno successivo
         }
