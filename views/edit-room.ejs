@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica <%= roomName %></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+    <h2>Modifica Prezzi per <%= roomName %></h2>
+    <form action="/admin/edit/<%= roomName %>" method="POST">
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Data Inizio</th>
+                    <th>Data Fine</th>
+                    <th>Costo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% csvData.forEach(function(row, index) { %>
+                <tr>
+                    <td><input type="text" name="csvData[<%= index %>][data inizio]" value="<%= row['data inizio'] %>" class="form-control"></td>
+                    <td><input type="text" name="csvData[<%= index %>][data fine]" value="<%= row['data fine'] %>" class="form-control"></td>
+                    <td><input type="text" name="csvData[<%= index %>][costo]" value="<%= row.costo %>" class="form-control"></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success">Salva modifiche</button>
+    </form>
+</body>
+</html>

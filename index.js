@@ -1,7 +1,14 @@
+require('dotenv').config(); // Carica le variabili d'ambiente dal file .env
+
 const express = require('express');
+const session = require('express-session');
+
+
 const path = require('path');
 const fs = require('fs');
-const csv = require('csv-parser');
+const csvParser = require('csv-parser');
+const { parse } = require('json2csv');
+
 const GoogleCalendar = require('./GoogleCalendar');
 const BookingHelper = require('./BookingHelper'); // Importa la classe BookingHelper
 
@@ -18,8 +25,23 @@ const {
     topNavigationBar
 } = require('./constants'); // Importa le costanti
 
+
+
+
 const app = express();
 const port = 3000;
+
+// Configurazione di express-session
+app.use(session({
+    secret: 'qRMhw87Vkk0RuT6fLAeYm4glbCjiPf8j', 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Assicurati che secure sia false se non stai utilizzando HTTPS
+}));
+
+// Configura EJS come motore di visualizzazione
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); // Imposta la cartella views
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,7 +51,6 @@ app.use('/assets', express.static(path.join(__dirname, 'assets'))); // Servire i
 const googleCalendar = new GoogleCalendar();
 
 // Array associativo per mappare gli ID dei calendari ai nomi delle stanze
-
 const translations = {
     "it": translations_it,
     "en": translations_en,
@@ -487,6 +508,103 @@ app.get('/calendars', async (req, res) => {
         res.status(500).send('Error fetching calendars');
     }
 });
+
+
+
+//*********************** */
+// ***   ADMIN AREA   *** */
+//*********************** */
+
+// Middleware per l'autenticazione dell'amministratore
+function authenticateAdmin(req, res, next) {
+    const { email, password } = req.body;
+
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+        req.session.isAdminAuthenticated = true; // Imposta la sessione
+        next();
+    } else {
+        res.status(401).send('Autenticazione fallita. Credenziali errate.');
+    }
+}
+
+// Rotta per la pagina di login dell'amministratore
+// Middleware per verificare se l'amministratore è autenticato
+function checkAdminAuth(req, res, next) {
+    if (req.session.isAdminAuthenticated) {
+        next(); // Se l'utente è autenticato, passa alla prossima funzione
+    } else {
+        res.status(401).send('Accesso non autorizzato. Effettua il login.');
+    }
+}
+
+// Rotta per la pagina di login dell'amministratore
+app.get('/admin/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-login.html'));
+});
+
+// Rotta per gestire il login dell'amministratore
+app.post('/admin/login', authenticateAdmin, (req, res) => {
+    res.redirect('/admin/dashboard');
+});
+
+// Rotta protetta per la dashboard dell'amministratore
+app.get('/admin/dashboard', checkAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+});
+
+// CSV Manipulation
+// Funzione per leggere i dati dal file CSV
+function readCSV(roomName) {
+    return new Promise((resolve, reject) => {
+        const filePath = path.join(__dirname, `rooms_prices/${roomName}.csv`);
+        const results = [];
+        fs.createReadStream(filePath)
+            .pipe(csvParser())
+            .on('data', (data) => results.push(data))
+            .on('end', () => resolve(results))
+            .on('error', (error) => reject(error));
+    });
+}
+
+// Funzione per scrivere i dati nel file CSV
+function writeCSV(roomName, data) {
+    return new Promise((resolve, reject) => {
+        const filePath = path.join(__dirname, `rooms_prices/${roomName}.csv`);
+        const csv = parse(data, { fields: ['data inizio', 'data fine', 'costo'] });
+        fs.writeFile(filePath, csv, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+}
+
+// Rotta per visualizzare i dati del CSV della stanza selezionata
+app.get('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
+    const roomName = req.params.roomName;
+    try {
+        const csvData = await readCSV(roomName);
+        res.render('edit-room', { roomName, csvData });
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).send('Errore durante la lettura del file CSV');
+    }
+});
+
+// Rotta per gestire l'aggiornamento del CSV
+app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
+    const roomName = req.params.roomName;
+    const updatedData = req.body.csvData;
+
+    try {
+        await writeCSV(roomName, updatedData);
+        res.redirect(`/admin/edit/${roomName}`);
+    } catch (error) {
+        res.status(500).send('Errore durante la scrittura nel file CSV');
+    }
+});
+
 
 // Avvia il server
 app.listen(port, () => {
