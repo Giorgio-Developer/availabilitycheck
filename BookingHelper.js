@@ -54,7 +54,7 @@ class BookingHelper {
             currentDate.add(1, 'days'); // Passa al giorno successivo
         }
 
-        if (pets == 'yes') {
+        if (pets != 'no' && pets != 'No')  {
             totalCost += costo_pet;
         }
 
