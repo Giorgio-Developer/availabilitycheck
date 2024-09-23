@@ -284,29 +284,6 @@ app.post('/freebusy', async (req, res) => {
 
             pets = formatPets(pets);
 
-            // const htmlResponseRoomsList = `
-            //     <div class="form-group col-md-12">
-            //         ${roomCosts.length > 0 ? `
-            //             <ul class="row list-unstyled" style="margin: 20px;">
-            //                 ${roomCosts.map(room => `
-            //                     <li class="col-md-4 d-flex mb-4">
-            //                         <div class="room card w-100">
-            //                             <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
-            //                             <div class="card-body">
-            //                                 <h5 class="room-name card-title">${room.name}</h5>
-            //                                 <p class="room-cost card-text">`+translateText("Costo totale per il periodo selezionato:", lang)+` ${room.totalCost} €</p>
-            //                                 <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(timeMin)}&checkout=${encodeURIComponent(timeMax)}&adults=${adults}&children=${children}&pets=${pets}&price=${room.totalCost}&lang=${lang}" class="btn btn-primary">`+translateText("Richiesta prenotazione", lang)+`</a>
-            //                             </div>
-            //                         </div>
-            //                     </li>
-            //                 `).join('')}
-            //             </ul>
-            //         ` : `
-            //             <p>`+translateText("Nessuno dei calendari è disponibile nel periodo selezionato.", lang)+`</p>
-            //         `}
-            //     </div>
-            // `;
-
             const htmlResponseRoomsList = `
             <div class="form-group col-md-12">
                 ${roomCosts.length > 0 ? `
@@ -361,18 +338,7 @@ app.post('/freebusy', async (req, res) => {
             const htmlAlternativeResponse = `
                 <div class="pl-5 pr-5">
                     <div class="form-group col-md-12">
-                    `+
-                        // `<h4
-                        //     style="
-                        //         margin-top: 20px; 
-                        //         padding: 10px 20px; 
-                        //         background-color: #007BFF; 
-                        //         color: white; 
-                        //         border-radius: 5px; 
-                        //         background-color: #11223355; 
-                        //         border: 1px solid lightgray;
-                        // ">`+translateText("Periodi alternativi disponibili", lang)+`</h4>`+
-                        `<ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
+                        <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
                             ${alternativeAvailability.map((room, index) => `
                                 <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
                                     <div class="room card w-100">
