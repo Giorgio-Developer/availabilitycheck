@@ -581,8 +581,28 @@ function writeCSV(roomName, data) {
 // Rotta per visualizzare i dati del CSV della stanza selezionata
 app.get('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     const roomName = req.params.roomName;
+
+     // Funzione per convertire la data da DD/MM/YYYY a YYYY-MM-DD
+     function convertDateToISO(date) {
+        const parts = date.split('/');
+        if (parts.length === 3) {
+            const day = parts[0].padStart(2, '0');
+            const month = parts[1].padStart(2, '0');
+            const year = parts[2];
+            return `${year}-${month}-${day}`;
+        }
+        return date; // Se la data non è in formato corretto, ritorna la data originale
+    }
+
     try {
         const csvData = await readCSV(roomName);
+
+        // Converti le date in formato ISO prima di passare i dati al template
+        csvData.forEach(row => {
+            row['data inizio'] = convertDateToISO(row['data inizio']);
+            row['data fine'] = convertDateToISO(row['data fine']);
+        });
+
         res.render('edit-room', { roomName, csvData });
     } catch (error) {
 
@@ -595,15 +615,36 @@ app.get('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
 // Rotta per gestire l'aggiornamento del CSV
 app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     const roomName = req.params.roomName;
-    const updatedData = req.body.csvData;
+    let csvData = req.body.csvData;
+
+    // Funzione per convertire la data da YYYY-MM-DD a DD/MM/YYYY
+    function convertDateToDDMMYYYY(date) {
+        const parts = date.split('-'); // Divide la data nel formato YYYY-MM-DD
+        if (parts.length === 3) {
+            const year = parts[0];
+            const month = parts[1];
+            const day = parts[2];
+            return `${day}/${month}/${year}`; // Ritorna il formato DD/MM/YYYY
+        }
+        return date; // Se la data non è in formato corretto, ritorna la data originale
+    }
+
+    // Prima di salvare, convertiamo le date nel formato DD/MM/YYYY
+    csvData = csvData.map(row => ({
+        'data inizio': convertDateToDDMMYYYY(row['data inizio']),
+        'data fine': convertDateToDDMMYYYY(row['data fine']),
+        costo: row.costo
+    }));
 
     try {
-        await writeCSV(roomName, updatedData);
+        // Scriviamo i dati aggiornati nel file CSV
+        await writeCSV(roomName, csvData);
         res.redirect(`/admin/edit/${roomName}`);
     } catch (error) {
         res.status(500).send('Errore durante la scrittura nel file CSV');
     }
 });
+
 
 
 // Avvia il server

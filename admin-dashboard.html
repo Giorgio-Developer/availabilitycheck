@@ -4,30 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dashboard-container {
+            margin-top: 5rem;
+        }
+        .dashboard-title {
+            color: #03a9f4;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .btn-dashboard {
+            background-color: #1f1f1f;
+            border-color: #03a9f4;
+            color: #03a9f4;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-dashboard:hover {
+            background-color: #0288d1;
+            color: #ffffff;
+        }
+        .material-icons {
+            margin-right: 8px;
+        }
+        .btn-dashboard:focus {
+            box-shadow: 0 0 0 0.2rem rgba(3, 169, 244, 0.5);
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
 </head>
-<body class="container mt-5">
-    <h2>Dashboard Amministratore</h2>
-    <div class="row mt-4">
-        <!-- Crea i pulsanti per ogni stanza -->
-        <div class="col-md-4">
-            <a href="/admin/edit/Calypso" class="btn btn-primary btn-block">Calypso</a>
-        </div>
-        <div class="col-md-4">
-            <a href="/admin/edit/Demetra" class="btn btn-primary btn-block">Demetra</a>
-        </div>
-        <div class="col-md-4">
-            <a href="/admin/edit/Elettra" class="btn btn-primary btn-block">Elettra</a>
-        </div>
-        <div class="col-md-4">
-            <a href="/admin/edit/Hermes" class="btn btn-primary btn-block">Hermes</a>
-        </div>
-        <div class="col-md-4">
-            <a href="/admin/edit/Iris_Oasis" class="btn btn-primary btn-block">Iris Oasis</a>
-        </div>
-        <div class="col-md-4">
-            <a href="/admin/edit/Villa_Panorama" class="btn btn-primary btn-block">Villa Panorama</a>
+<body>
+    <div class="container dashboard-container">
+        <h2 class="dashboard-title">Dashboard Amministratore</h2>
+        <div class="row">
+            <!-- Crea i pulsanti per ogni stanza -->
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Calypso" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Calypso
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Demetra" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Demetra
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Elettra" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Elettra
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Hermes" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Hermes
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Iris_Oasis" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Iris Oasis
+                </a>
+            </div>
+            <div class="col-md-4 mb-4">
+                <a href="/admin/edit/Villa_Panorama" class="btn btn-dashboard btn-block">
+                    <i class="material-icons">room</i> Villa Panorama
+                </a>
+            </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
