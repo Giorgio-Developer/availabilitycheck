@@ -175,6 +175,51 @@ app.post('/freebusy', async (req, res) => {
             wordpressBaseUrl = wordpressBaseUrl + "/";
         }
 
+        const currentDate = new Date();
+        const requestTimeMin = new Date(timeMin);
+        const twelveMonthsAhead = new Date();
+        twelveMonthsAhead.setFullYear(currentDate.getFullYear() + 1);
+
+        // Se la data richiesta è oltre 12 mesi nel futuro
+        if (requestTimeMin > twelveMonthsAhead) {
+            const htmlResponseFutureUnavailable = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
+                    <!-- Bootstrap CSS -->
+                    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                    <link rel="stylesheet" href="assets/css/style.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+                    `+topNavigationBarCSS+topNavBarJS+`
+                </head>
+                <body class="body_bg">
+                    `+topNavigationBar+`
+                    <div class="header" style="padding-top: 50px;">
+                        <h4 style="
+                            margin-top: 20px; 
+                            padding: 10px 20px; 
+                            background-color: #007BFF; 
+                            color: white; 
+                            border-radius: 5px; 
+                            background-color: #11223355; 
+                            border: 1px solid lightgray;">
+                            `+translateText("Per chiedere disponibilità per periodi più remoti di 12 mesi da oggi, inviare una richiesta di preventivo a booking@villapanoramasuite.it", lang)+`
+                        </h4>
+                    </div>
+                    <div class="row" style="padding-top: 50px; text-align: center;">
+                        <div class="form-group col-md-3">
+                            &nbsp;
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+            res.send(htmlResponseFutureUnavailable);
+            return;
+        }
 
 
         var htmlResponsePrefix = `
