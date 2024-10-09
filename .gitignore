@@ -3,3 +3,10 @@ credentials.json
 token.json
 *.pem
 .env
+rooms_prices/*
+rooms_prices/Calypso.csv
+rooms_prices/Demetra.csv
+rooms_prices/Elettra.csv
+rooms_prices/Hermes.csv
+rooms_prices/Iris Oasis.csv
+rooms_prices/Villa Panorama.csv
