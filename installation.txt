@@ -1,2 +1,6 @@
 npm install
 node index.js
+
+oppure per refactoring branch
+
+node app.js
