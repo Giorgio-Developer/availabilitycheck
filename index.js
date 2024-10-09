@@ -445,7 +445,7 @@ app.post('/freebusy', async (req, res) => {
                 </div>
             `;
 
-            const htmlResponse = "";
+            var htmlResponse = "";
             if (alternativeAvailability.length === 0) 
                 htmlResponse = htmlResponsePrefixNoAlternative + htmlResponsePostfix;
             else
