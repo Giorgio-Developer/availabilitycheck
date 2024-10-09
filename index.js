@@ -629,12 +629,52 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
         return date; // Se la data non è in formato corretto, ritorna la data originale
     }
 
-    // Prima di salvare, convertiamo le date nel formato DD/MM/YYYY
+    // Funzione per convertire una data da DD/MM/YYYY a un oggetto Date
+    function convertToDateObject(date) {
+        const parts = date.split('/'); // Divide la data nel formato DD/MM/YYYY
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // JavaScript usa i mesi da 0 a 11
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }
+
+    // Funzione per verificare che non ci siano sovrapposizioni o buchi temporali
+    function validateDates(data) {
+        const sortedData = data.slice().sort((a, b) => convertToDateObject(a['data inizio']) - convertToDateObject(b['data inizio']));
+
+        for (let i = 0; i < sortedData.length - 1; i++) {
+            const currentEnd = convertToDateObject(sortedData[i]['data fine']);
+            const nextStart = convertToDateObject(sortedData[i + 1]['data inizio']);
+
+            // Verifica che non ci siano buchi temporali (la data di fine del periodo attuale deve essere esattamente un giorno prima dell'inizio del prossimo)
+            const expectedNextStart = new Date(currentEnd);
+            expectedNextStart.setDate(expectedNextStart.getDate() + 1);
+
+            if (nextStart > expectedNextStart) {
+                return `Errore: Ci sono buchi temporali tra ${sortedData[i]['data fine']} e ${sortedData[i + 1]['data inizio']}`;
+            }
+
+            // Verifica che non ci siano sovrapposizioni
+            if (nextStart <= currentEnd) {
+                return `Errore: Ci sono sovrapposizioni tra ${sortedData[i]['data fine']} e ${sortedData[i + 1]['data inizio']}`;
+            }
+        }
+
+        return null; // Nessun errore
+    }
+
+    // Prima di salvare, convertiamo le date nel formato DD/MM/YYYY e verifichiamo le sovrapposizioni e i buchi temporali
     csvData = csvData.map(row => ({
         'data inizio': convertDateToDDMMYYYY(row['data inizio']),
         'data fine': convertDateToDDMMYYYY(row['data fine']),
         costo: row.costo
     }));
+
+    // Esegui la validazione delle date
+    const validationError = validateDates(csvData);
+    if (validationError) {
+        return res.status(500).render('error', { message: validationError, backUrl: `/admin/edit/${roomName}` });
+    }
 
     try {
         // Scriviamo i dati aggiornati nel file CSV
@@ -644,6 +684,7 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
         res.status(500).send('Errore durante la scrittura nel file CSV');
     }
 });
+
 
 
 
