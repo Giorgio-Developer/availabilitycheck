@@ -238,12 +238,6 @@ app.post('/freebusy', async (req, res) => {
                     +topNavigationBar+
                 `
                     <div class="header" style="padding-top: 50px;">`+
-                        // `<button onclick="window.history.back()">
-                        //     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        //         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                        //     </svg>
-                        // </button>`+
-                        `<p>`+
                             `<h4  style="
                                 margin-top: 20px; 
                                 padding: 10px 20px; 
@@ -252,7 +246,46 @@ app.post('/freebusy', async (req, res) => {
                                 border-radius: 5px; 
                                 background-color: #11223355; 
                                 border: 1px solid lightgray;
-                                ">`+translateText("Nessuna Suite disponibile per l'intero periodo selezionato", lang)+`
+                                ">`+translateText("Ecco le stanze disponibili con periodi più vicini alle date richieste", lang)+`
+                            </h4>`+
+                        `</p>
+                    </div>
+                    <div class="row" style="padding-top: 50px; text-align: center;">
+                        <div class="form-group col-md-3">
+                            &nbsp;
+                        </div>
+        `;
+
+        var htmlResponsePrefixNoAlternative = `
+            <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>`+translateText("Disponibilità Villa Panorama", lang)+`</title>
+                    <!-- Bootstrap CSS -->
+                    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                    <link rel="stylesheet" href="assets/css/style.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+                    `
+                        +topNavigationBarCSS+topNavBarJS+
+                    `
+
+                </head>
+                <body class="body_bg">
+                `
+                    +topNavigationBar+
+                `
+                    <div class="header" style="padding-top: 50px;">`+
+                            `<h4  style="
+                                margin-top: 20px; 
+                                padding: 10px 20px; 
+                                background-color: #007BFF; 
+                                color: white; 
+                                border-radius: 5px; 
+                                background-color: #11223355; 
+                                border: 1px solid lightgray;
+                                ">`+translateText("Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it", lang)+`
                             </h4>`+
                         `</p>
                     </div>
@@ -412,8 +445,11 @@ app.post('/freebusy', async (req, res) => {
                 </div>
             `;
 
-
-            const htmlResponse = htmlResponsePrefixNoAvail + htmlAlternativeResponse + htmlResponsePostfix;
+            const htmlResponse = "";
+            if (alternativeAvailability.length === 0) 
+                htmlResponse = htmlResponsePrefixNoAlternative + htmlResponsePostfix;
+            else
+                htmlResponse = htmlResponsePrefixNoAvail + htmlAlternativeResponse + htmlResponsePostfix;
 
             res.send(htmlResponse);
         }

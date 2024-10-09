@@ -27,8 +27,9 @@ const translations_it = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Nessuno dei calendari è disponibile nel periodo selezionato.",
     "Periodi alternativi disponibili": "Periodi alternativi disponibili:",
     "Richiesta prenotazione": "Richiesta prenotazione",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Ecco le stanze disponibili con periodi più vicini alle date richieste",
-    "Seleziona": "Seleziona"
+    "Ecco le stanze disponibili con periodi più vicini alle date richieste": "Ecco le stanze disponibili con periodi più vicini alle date richieste",
+    "Seleziona": "Seleziona",
+    "Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it": "Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it"
 };
 
 const translations_en = {
@@ -38,8 +39,9 @@ const translations_en = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "None of the calendars are available in the selected period.",
     "Periodi alternativi disponibili": "Alternative periods available:",
     "Richiesta prenotazione": "Booking request",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Here are the available rooms closest to the requested dates",
-    "Seleziona": "Choose"
+    "Ecco le stanze disponibili con periodi più vicini alle date richieste": "Here are the available rooms closest to the requested dates",
+    "Seleziona": "Choose",
+    "Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it": "At the moment there are no rooms available in the requested period. Contact us at: booking@villapanoramasuite.it"
 };
 
 const translations_fr = {
@@ -49,8 +51,9 @@ const translations_fr = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Aucun des calendriers n'est disponible dans la période sélectionnée.",
     "Periodi alternativi disponibili": "Périodes alternatives disponibles:",
     "Richiesta prenotazione": "Demande de réservation",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Voici les chambres disponibles les plus proches des dates demandées",
-    "Seleziona": "Choisir"
+    "Ecco le stanze disponibili con periodi più vicini alle date richieste": "Voici les chambres disponibles les plus proches des dates demandées",
+    "Seleziona": "Choisir",
+    "Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it": "Pour le moment, il n'y a pas de chambres disponibles dans la période demandée. Contactez-nous à l'adresse:booking@villapanoramasuite.it"
 };
 
 const translations_de = {
@@ -60,8 +63,9 @@ const translations_de = {
     "Nessuno dei calendari è disponibile nel periodo selezionato.": "Keiner der Kalender ist im ausgewählten Zeitraum verfügbar.",
     "Periodi alternativi disponibili": "Alternative Zeiträume verfügbar:",
     "Richiesta prenotazione": "Buchungsanfrage",
-    "Nessuna Suite disponibile per l'intero periodo selezionato": "Hier sind die verfügbaren Zimmer, die am nächsten zu den gewünschten Terminen liegen",
-    "Seleziona": "Wählen"
+    "Ecco le stanze disponibili con periodi più vicini alle date richieste": "Hier sind die verfügbaren Zimmer, die am nächsten zu den gewünschten Terminen liegen",
+    "Seleziona": "Wählen",
+    "Al momento non ci sono stanze disponibili nel periodo richiesto. Contattaci all'indirizzo: booking@villapanoramasuite.it": "Derzeit sind keine Zimmer im gewünschten Zeitraum verfügbar. Kontaktieren Sie uns unter:booking@villapanoramasuite.it"
 };
 
 const htmlResponsePostfix = `
