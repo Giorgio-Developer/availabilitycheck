@@ -27,7 +27,7 @@ const { parse } = require('json2csv');
 // Funzione per leggere i dati dal file CSV
 function readCSV(roomName) {
     return new Promise((resolve, reject) => {
-        const filePath = path.join(__dirname, `rooms_prices/${roomName}.csv`);
+        const filePath = path.join(__dirname, `../rooms_prices/${roomName}.csv`);
         const results = [];
         fs.createReadStream(filePath)
             .pipe(csvParser())
@@ -40,7 +40,7 @@ function readCSV(roomName) {
 // Funzione per scrivere i dati nel file CSV
 function writeCSV(roomName, data) {
     return new Promise((resolve, reject) => {
-        const filePath = path.join(__dirname, `rooms_prices/${roomName}.csv`);
+        const filePath = path.join(__dirname, `../rooms_prices/${roomName}.csv`);
         const csv = parse(data, { fields: ['data inizio', 'data fine', 'costo'] });
         fs.writeFile(filePath, csv, (err) => {
             if (err) reject(err);

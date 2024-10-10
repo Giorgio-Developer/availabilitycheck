@@ -4,14 +4,10 @@ const session = require('express-session');
 const path = require('path');
 
 // Importa le rotte
-const adminRoutes = require('./routes/admin');
 const calendarRoutes = require('./routes/calendar');
 const freebusyRoutes = require('./routes/freebusy');
 
-// Middleware di autenticazione per l'amministratore
-const adminAuth = require('./middleware/checkAdminAuth');
-
-const { convertDateToDDMMYYYY, convertToDateObject, validateDates } = require('./utils/dateUtils');
+const { convertDateToDDMMYYYY, validateDates } = require('./utils/dateUtils');
 const { readCSV, writeCSV } = require('./utils/csvUtils');
 
 // Crea un'applicazione Express
@@ -26,8 +22,6 @@ app.use(session({
     cookie: { secure: false } // Assicurati che secure sia false se non stai usando HTTPS
 }));
 
-app.use('/', calendarRoutes);
-
 // Configura EJS come motore di visualizzazione
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views')); // Imposta la cartella views
@@ -37,6 +31,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static(path.join(__dirname, 'assets'))); // Servire i file statici dalla cartella assets
 
 
+// Rotte per il calendario e la disponibilità
+app.use('/', calendarRoutes);
+app.use('/', freebusyRoutes);
+
+
+// ADMIN AREA
 // Rotta per la pagina di login dell'amministratore
 app.get('/admin/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-login.html'));
@@ -64,7 +64,6 @@ function authenticateAdmin(req, res, next) {
     }
 }
 
-// Rotta per la pagina di login dell'amministratore
 // Middleware per verificare se l'amministratore è autenticato
 function checkAdminAuth(req, res, next) {
     if (req.session.isAdminAuthenticated) {
@@ -73,13 +72,6 @@ function checkAdminAuth(req, res, next) {
         res.status(401).send('Accesso non autorizzato. Effettua il login.');
     }
 }
-
-
-app.use('/', freebusyRoutes);
-
-// app.use('/admin', adminRoutes);
-
-
 
 app.get('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     const roomName = req.params.roomName;
@@ -115,7 +107,7 @@ app.get('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
 });
 
 // Rotta per gestire l'aggiornamento del CSV
-app.post('/edit/:roomName', checkAdminAuth, async (req, res) => {
+app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     const roomName = req.params.roomName;
     let csvData = req.body.csvData;
 
@@ -140,6 +132,7 @@ app.post('/edit/:roomName', checkAdminAuth, async (req, res) => {
         res.status(500).send('Errore durante la scrittura nel file CSV');
     }
 });
+
 
 
 // Avvia il server

@@ -25,9 +25,6 @@ const {
     topNavigationBar
 } = require('./constants'); // Importa le costanti
 
-
-
-
 const app = express();
 const port = 3000;
 
