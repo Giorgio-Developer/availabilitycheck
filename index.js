@@ -111,7 +111,7 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     const roomName = req.params.roomName;
     let csvData = req.body.csvData;
 
-    // Prima di salvare, convertiamo le date nel formato DD/MM/YYYY e verifichiamo le sovrapposizioni e i buchi temporali
+    // Convertiamo le date nel formato DD/MM/YYYY e verifichiamo le sovrapposizioni e i buchi temporali
     csvData = csvData.map(row => ({
         'data inizio': convertDateToDDMMYYYY(row['data inizio']),
         'data fine': convertDateToDDMMYYYY(row['data fine']),
@@ -121,17 +121,19 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     // Esegui la validazione delle date
     const validationError = validateDates(csvData);
     if (validationError) {
-        return res.status(500).render('error', { message: validationError, backUrl: `/admin/edit/${roomName}` });
+        return res.status(500).json({ error: validationError });
     }
 
     try {
         // Scriviamo i dati aggiornati nel file CSV
         await writeCSV(roomName, csvData);
-        res.redirect(`/admin/edit/${roomName}`);
+        // Rispondi con JSON
+        res.json({ success: true, data: csvData });
     } catch (error) {
-        res.status(500).send('Errore durante la scrittura nel file CSV');
+        res.status(500).json({ error: 'Errore durante la scrittura nel file CSV' });
     }
 });
+
 
 
 
