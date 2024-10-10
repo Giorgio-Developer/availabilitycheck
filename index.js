@@ -2,6 +2,14 @@ require('dotenv').config(); // Carica le variabili d'ambiente dal file .env
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const axios = require('axios');
+
+// ENV Constants
+const apiKey = process.env.OPENAI_API_KEY;
+const port = process.env.PORT || 3000;
+const sessionSecret = process.env.SESSION_SECRET;
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD;
 
 // Importa le rotte
 const calendarRoutes = require('./routes/calendar');
@@ -9,14 +17,14 @@ const freebusyRoutes = require('./routes/freebusy');
 
 const { convertDateToDDMMYYYY, validateDates } = require('./utils/dateUtils');
 const { readCSV, writeCSV } = require('./utils/csvUtils');
+const { admin } = require('googleapis/build/src/apis/admin');
 
 // Crea un'applicazione Express
 const app = express();
-const port = process.env.PORT || 3000;
 
 // Configura express-session
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Utilizza la variabile SESSION_SECRET dal file .env
+    secret: sessionSecret, // Utilizza la variabile SESSION_SECRET dal file .env
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Assicurati che secure sia false se non stai usando HTTPS
@@ -56,7 +64,7 @@ app.get('/admin/dashboard', checkAdminAuth, (req, res) => {
 function authenticateAdmin(req, res, next) {
     const { email, password } = req.body;
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    if (email === adminEmail && password === adminPassword) {
         req.session.isAdminAuthenticated = true; // Imposta la sessione
         next();
     } else {
