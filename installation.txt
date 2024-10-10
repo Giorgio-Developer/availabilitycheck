@@ -1,6 +1,8 @@
 npm install
 npm install axios
 npm audit fix
+npm install openai
+
 
 node index.js
 
