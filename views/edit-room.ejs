@@ -196,6 +196,13 @@
         </div>
     </form>
 
+    <!-- Loader -->
+    <div id="loader" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);z-index:9999;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Modale per il riepilogo -->
     <div id="riepilogoModale" class="modal">
         <div class="modal-content">
@@ -225,18 +232,29 @@
             costoCell.innerHTML = `<input type="text" name="csvData[${rowCount}][costo]" class="form-control">`;
             deleteCell.innerHTML = `<button type="button" class="btn btn-danger" onclick="deleteThisRow(this)" style="background-color: #1f1f1f; border-color: #03a9f4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg></button>`;
         }
-    
+
         // Funzione per eliminare la riga
         function deleteThisRow(btn) {
             const row = btn.parentNode.parentNode;
             row.parentNode.removeChild(row);
         }
-    
+
+
+        // Funzione per mostrare il loader
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        // Funzione per nascondere il loader
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+
         // Funzione per mostrare la modale e visualizzare il riepilogo
-        function showRiepilogoModale(data) {
+        function showRiepilogoModale(data, aiConfirmation) {
             const riepilogoContent = document.getElementById('riepilogoContent');
             riepilogoContent.innerHTML = '';
-    
+
             data.forEach(row => {
                 riepilogoContent.innerHTML += `
                     <p>Data Inizio: ${row['data inizio']}</p>
@@ -245,11 +263,19 @@
                     <hr>
                 `;
             });
-    
+
+            // Aggiungiamo la conferma dell'AI
+            riepilogoContent.innerHTML = `
+                <h4>Conferma AI:</h4>
+                <p>${aiConfirmation}</p>
+                <hr>
+                <h3>Riepilogo</h3>
+            `+riepilogoContent.innerHTML;
+
             const modale = document.getElementById('riepilogoModale');
             modale.style.display = 'block';
         }
-    
+
         // Gestione chiusura della modale
         document.querySelector('.close').onclick = function() {
             document.getElementById('riepilogoModale').style.display = 'none';
@@ -269,7 +295,10 @@
         // Funzione per inviare il form via AJAX
         document.querySelector('form').addEventListener('submit', function (e) {
             e.preventDefault(); // Previeni il comportamento di default (invio del form)
-    
+
+            // Mostra il loader
+            showLoader();
+
             const formData = new FormData(this);
             const csvData = [];
             for (let pair of formData.entries()) {
@@ -293,8 +322,12 @@
             })
             .then(response => response.json())
             .then(data => {
+
+                // Nascondi il loader
+                hideLoader();
+
                 if (data.success) {
-                    showRiepilogoModale(data.data);
+                    showRiepilogoModale(data.data, data.aiConfirmation);
                 } else {
                     alert('Errore: ' + data.error);
                 }

@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const axios = require('axios');
+const OpenAI = require('openai');
 
 // ENV Constants
 const apiKey = process.env.OPENAI_API_KEY;
@@ -132,11 +133,29 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
         return res.status(500).json({ error: validationError });
     }
 
+    const prompt = 
+        "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?"+
+    `${csvData.map(row => `Data inizio: ${row['data inizio']}, Data fine: ${row['data fine']}, Costo: ${row.costo}`).join('\n')}`;
+
+    // Chiamata alle API di OpenAI per chiedere conferma della congruità dei prezzi
+    const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+    }, {
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    const aiConfirmation = openAiResponse.data.choices[0].message.content;
+    // console.log(aiConfirmation);
+
     try {
         // Scriviamo i dati aggiornati nel file CSV
         await writeCSV(roomName, csvData);
         // Rispondi con JSON
-        res.json({ success: true, data: csvData });
+        res.json({ success: true, data: csvData, aiConfirmation: aiConfirmation });
     } catch (error) {
         res.status(500).json({ error: 'Errore durante la scrittura nel file CSV' });
     }
