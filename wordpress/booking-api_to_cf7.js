@@ -16,12 +16,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 	
 	function setFieldValue(parameterName) {
-		
-		// parameterName = adults
+
 		let value = getUrlParameter(parameterName);
+		
+		if(parameterName == 'Adulti') parameterName = 'adults';
+		if(parameterName == 'Bambini') parameterName = 'children';
+		if(parameterName == 'Animalipiccolataglia') parameterName = 'pets';
+		if(parameterName == 'date-995') parameterName = 'checkin';
+		if(parameterName == 'date-996') parameterName = 'checkout';
+		if(parameterName == 'Prezzo') parameterName = 'price';
+		
+		
+		
+		
 		let inputField = document.getElementById(parameterName);
 		let text = document.getElementById(parameterName+'Text');
-		
+	
 		if(value) {
 			if(inputField)
 				inputField.value = value;
@@ -63,7 +73,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	setFieldValue('room');
 	setFieldValue('children');
 	setFieldValue('pets');
-
+	
+	// 
+	setFieldValue('Adulti');
+	setFieldValue('Bambini');
+	setFieldValue('Animalipiccolataglia');
+	setFieldValue('date-995');
+	setFieldValue('date-996');
+	setFieldValue('Prezzo');
+	setFieldValue('anticipo');
+	
     if(price) {
         let priceInput = document.getElementById('price');
         priceInput.value = price;
