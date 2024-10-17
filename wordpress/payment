@@ -1,0 +1,72 @@
+<div class="elementor-shortcode">
+    <div class="" id="" lang="it-IT" dir="ltr">
+        <div class="screen-reader-response">
+            <p role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
+
+        <p>
+            <label><b> Riepilogo richiesta di prenotazione<br></b></label>
+        </p>
+        <p>
+        <p>
+            <div style="display: flex;"> Stanza: &nbsp; <div id="roomText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Adulti: &nbsp; <div id="adultsText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Bambini: &nbsp; <div id="childrenText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Animali: &nbsp; <div id="petsText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Prezzo: &nbsp; <div id="priceText" style="color: gray;"></div></div>
+        </p>
+        <p>
+            <div style="display: flex;"> Check-in: &nbsp; <div id="checkinText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Check-out: &nbsp; <div id="checkoutText" style="color: gray;"></div> </div>
+        </p>
+        <p>
+            <div style="display: flex;"> Anticipo: &nbsp; <div id="anticipoText" style="color: gray;"></div><span style="color: gray;">&nbsp;€ </span></div>
+        </p>
+        
+        <div style="display: none;">
+            <input type="hidden" id="room" name="room">
+            <input type="hidden" id="adults" name="Adulti">
+            <input type="hidden" id="children" name="Bambini">
+            <input type="hidden" id="pets" name="Animalipiccolataglia">
+            <input type="hidden" id="price" name="Prezzo">
+            <input id="checkin" type="hidden" value="" name="date-995" >
+            <input id="checkout" type="hidden" value="" name="date-996" >
+        </div>
+    
+        <!-- PAYPAL BUTTON FORM -->
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <!-- Identificativo del business o email PayPal -->
+            <input type="hidden" name="business" value="booking@villapanoramasuite.it">
+        
+            <!-- Dettagli del pagamento -->
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="item_name" value="Prenotazione">
+            <input type="hidden" name="currency_code" value="EUR">
+            <!-- URL di ritorno -->
+            <input type="hidden" name="return" value="https://villapanoramasuite.it/prenotazione-confermata/">
+            <!-- URL di cancellazione -->
+            <input type="hidden" name="cancel_return" value="https://villapanoramasuite.it/pagamento-fallito/">
+    
+        
+            <!-- Importo dinamico -->
+            <input type="hidden" id="amount" name="amount" value="">
+        
+            <!-- Bottone di pagamento -->
+            <div style="text-align: center;display: flex;justify-content: center;">
+                <input type="image" id="paypal_btn" style="display: block;" src="https://www.paypalobjects.com/it_IT/IT/i/btn/btn_paynowCC_LG.gif" border="0" name="submit" alt="Versa anticipo">
+            </div>
+        </form>
+        
+
+    </div>
+</div>
