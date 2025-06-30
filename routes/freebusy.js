@@ -7,6 +7,7 @@ const { convertDate } = require('../utils/dateUtils');
 const googleCalendar = new GoogleCalendar();
 const { 
     roomsNames, 
+    roomImagesByName,
     roomsImages,
     htmlResponsePostfix,
     topNavigationBarCSS,
@@ -17,6 +18,50 @@ const {
 // Aggiungi qui tutte le altre funzioni che sono utilizzate nella rotta, come translateText, convertDate, etc.
 const { translateText } = require('../utils/translate'); // Supponendo che tu abbia creato una funzione translateText in un file separato
 const { findNextAvailablePeriods } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
+
+
+// --- AGGIUNGI QUESTO PRIMA DELLA DEFINIZIONE DELLA ROTTA ---
+
+const calendarsPerRoom = {
+    "Calypso": [
+        "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com",
+    ],
+    "Hermes": [
+        "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com",
+        "si9t6943hokkgrp3u4jgdrr6lmvcujcn@import.calendar.google.com"
+    ],
+    "Elettra": [
+        "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com"
+    ],
+    "Villa Panorama": [
+        "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com"
+    ],
+    "Demetra": [
+        "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com"
+    ],
+    "Iris Oasis": [
+        "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com"
+    ]
+};
+
+async function checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, googleCalendar) {
+    const calendars = calendarsPerRoom[roomName];
+
+    const requestBody = {
+        timeMin: new Date(timeMin).toISOString(),
+        timeMax: new Date(timeMax).toISOString(),
+        items: calendars.map(id => ({ id })),
+    };
+
+    const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
+
+    // La stanza è disponibile solo se TUTTI i calendari non hanno eventi occupati
+    const allCalendarsFree = calendars.every(calendarId => freeBusyResponse[calendarId].busy.length === 0);
+
+    return allCalendarsFree;
+}
+
+
 
 // Rotta per controllare la disponibilità delle camere
 router.post('/freebusy', async (req, res) => {
@@ -237,23 +282,23 @@ router.post('/freebusy', async (req, res) => {
             pets: pets,
         };
 
-        const freeBusyResponse = await googleCalendar.checkFreeBusy(oAuth2Client, requestBody);
+        // Qui usiamo la nuova logica per verificare ogni stanza
+        let availableRooms = [];
 
-        // Calendari disponibili
-        const availableCalendars = Object.keys(freeBusyResponse).filter(calendarId => {
-            const busyTimes = freeBusyResponse[calendarId].busy;
-            return busyTimes.length === 0;
-        }).map(calendarId => ({
-            name: roomsNames[calendarId],
-            image: roomsImages[calendarId],
-            calendarId: calendarId,
-        }));
+        for (const roomName in calendarsPerRoom) {
+            const isAvailable = await checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, googleCalendar);
+            if (isAvailable) {
+                availableRooms.push({
+                    name: roomName,
+                    image: roomsImages[roomName],
+                });
+            }
+        }
 
-        if (availableCalendars.length > 0) {
-            const roomCosts = await Promise.all(availableCalendars.map(async room => {
+        // Se ci sono stanze disponibili calcoliamo i prezzi:
+        if (availableRooms.length > 0) {
+            const roomCosts = await Promise.all(availableRooms.map(async room => {
                 const bookings = await BookingHelper.readCSV(`rooms_prices/${room.name}.csv`);
-
-                // Calcola il costo totale per il periodo selezionato
                 const totalCost = BookingHelper.calculateTotalCostV2(bookings, timeMin, timeMax, adults, children, pets);
                 return {
                     ...room,
@@ -270,7 +315,7 @@ router.post('/freebusy', async (req, res) => {
                         ${roomCosts.map(room => `
                             <li class="col-md-4 d-flex mb-4">
                                 <div class="room card w-100">
-                                    <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                    <img src="/assets/images/${roomImagesByName[room.name]}" alt="${room.name}" class="card-img-top">
                                     <div class="card-body">
                                         <h5 class="room-name card-title">${room.name}</h5>
                                         <p class="room-cost card-text">

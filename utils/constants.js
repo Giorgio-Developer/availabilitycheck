@@ -10,6 +10,16 @@ const roomsNames = {
     "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com": "Iris Oasis",
 };
 
+// Aggiungila accanto a roomsImages
+const roomImagesByName = {
+    "Villa Panorama": "Villa_Panorama_Suite.jpg",
+    "Elettra": "Elettra.jpg",
+    "Calypso": "Calypso.jpeg",
+    "Hermes": "Hermes.jpg",
+    "Demetra": "Demetra.jpg",
+    "Iris Oasis": "IrisOasis.jpg",
+};
+
 const roomsImages = {
     "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com": "Villa_Panorama_Suite.jpg",
     "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com": "Elettra.jpg",
@@ -288,6 +298,7 @@ const topNavigationBar = `
 module.exports = {
 
     roomsNames,
+    roomImagesByName,
     roomsImages,
     translations_it,
     translations_en,
