@@ -20,27 +20,30 @@ const { translateText } = require('../utils/translate'); // Supponendo che tu ab
 const { findNextAvailablePeriods } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
 
 
-// --- AGGIUNGI QUESTO PRIMA DELLA DEFINIZIONE DELLA ROTTA ---
-
 const calendarsPerRoom = {
     "Calypso": [
         "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com",
+        "h3144fvvdhmk3pc9d3lo76vt0vpdcm0s@import.calendar.google.com"
     ],
     "Hermes": [
         "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com",
         "si9t6943hokkgrp3u4jgdrr6lmvcujcn@import.calendar.google.com"
     ],
     "Elettra": [
-        "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com"
+        "ipdt2erdd6eoriaukuae2vv0c22fsba8@import.calendar.google.com",
+        "lapifn59ijeb36asa1gq0v38qkmbvh3v@import.calendar.google.com"
     ],
     "Villa Panorama": [
-        "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com"
+        "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com",
+        "tc2jt6t6bks60ki5864taeatqinb3cd4@import.calendar.google.com"
     ],
     "Demetra": [
-        "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com"
+        "ceph5hop46teenje89bt5g2pbr70td9g@import.calendar.google.com",
+        "uqshafo4vjve6ce7ts5eifutaiu9uh2o@import.calendar.google.com"
     ],
     "Iris Oasis": [
-        "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com"
+        "tqscm1ioj0n52vdda1bjsvsms019tkq3@import.calendar.google.com",
+        "f6jephdvk35md7hbqpcpa7nd2v7kpd4k@import.calendar.google.com"
     ]
 };
 
