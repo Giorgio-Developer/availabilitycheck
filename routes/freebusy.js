@@ -58,8 +58,10 @@ async function checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, g
     // La stanza è disponibile solo se TUTTI i calendari non hanno eventi occupati
     const allCalendarsFree = calendars.every(calendarId => freeBusyResponse[calendarId].busy.length === 0);
 
-    return allCalendarsFree;
+    // Ora restituiamo ANCHE la risposta completa per usarla dopo
+    return { allCalendarsFree, freeBusyResponse };
 }
+
 
 
 
@@ -284,13 +286,18 @@ router.post('/freebusy', async (req, res) => {
 
         // Qui usiamo la nuova logica per verificare ogni stanza
         let availableRooms = [];
+        let allFreeBusyResponses = {};
 
         for (const roomName in calendarsPerRoom) {
-            const isAvailable = await checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, googleCalendar);
-            if (isAvailable) {
+            const { allCalendarsFree, freeBusyResponse } = await checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, googleCalendar);
+            
+            // Memorizziamo sempre la risposta per ogni stanza
+            allFreeBusyResponses[roomName] = freeBusyResponse;
+
+            if (allCalendarsFree) {
                 availableRooms.push({
                     name: roomName,
-                    image: roomsImages[roomName],
+                    image: roomImagesByName[roomName],
                 });
             }
         }
@@ -344,82 +351,88 @@ router.post('/freebusy', async (req, res) => {
             res.send(htmlResponse);
         } else {
             // Trova prossime disponibilità utilizzando la risposta di checkFreeBusy
+            // logica per alternative quando non ci sono camere disponibili
             let alternativeAvailability = [];
-            for (const calendarId of calendarIds) {
-                const busyPeriods = freeBusyResponse[calendarId].busy;
-                const periods = await findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, children, pets, roomsNames[calendarId]);
+
+            for (const roomName in calendarsPerRoom) {
+                const calendars = calendarsPerRoom[roomName];
+                const freeBusyResponse = allFreeBusyResponses[roomName];
+
+                // Combina i busy periods da tutti i calendari di questa stanza
+                let combinedBusyPeriods = [];
+                calendars.forEach(calendarId => {
+                    combinedBusyPeriods = combinedBusyPeriods.concat(freeBusyResponse[calendarId].busy);
+                });
+
+                // Ora cerca le alternative usando i periodi occupati combinati
+                const periods = await findNextAvailablePeriods(combinedBusyPeriods, timeMin, timeMax, adults, children, pets, roomName);
+
                 if (periods.length > 0) {
                     alternativeAvailability.push({
-                        calendarId: calendarId,
-                        name: roomsNames[calendarId],
-                        image: roomsImages[calendarId],
+                        name: roomName,
+                        image: roomImagesByName[roomName],
                         availablePeriods: periods
                     });
                 }
             }
 
-            // Costruisci risposta HTML per periodi alternativi
+            // Costruisci risposta HTML per periodi alternativi (rimane invariata)
             const htmlAlternativeResponse = `
-                <div class="pl-5 pr-5">
-                    <div class="form-group col-md-12">
-                        <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
-                            ${alternativeAvailability.map((room, index) => `
-                                <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
-                                    <div class="room card w-100">
-                                        <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
-                                        <div class="card-body">
-                                            <h5 class="room-name card-title">${room.name}</h5>
-                                            <ul class="list-unstyled" style="font-weight: 300; font-size: smaller;">
-                                                ${room.availablePeriods.map(period => {
-                                                    // Qui utilizziamo convertDate per formattare le date
-                                                    const formattedStartDate = convertDate(period.start);
-                                                    const formattedEndDate = convertDate(period.end);
-                                                    pets = formatPets(pets);
+            <div class="pl-5 pr-5">
+                <div class="form-group col-md-12">
+                    <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
+                        ${alternativeAvailability.map((room, index) => `
+                            <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
+                                <div class="room card w-100">
+                                    <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
+                                    <div class="card-body">
+                                        <h5 class="room-name card-title">${room.name}</h5>
+                                        <ul class="list-unstyled" style="font-weight: 300; font-size: smaller;">
+                                            ${room.availablePeriods.map(period => {
+                                                const formattedStartDate = convertDate(period.start);
+                                                const formattedEndDate = convertDate(period.end);
+                                                pets = formatPets(pets);
 
-                                                    // Previene l'errore se il costo totale non può essere calcolato
-                                                    if(period.totalCost == "Error in cost calculation") {
-                                                        return `
-                                                        <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
-                                                            <div>
-                                                                ${period.start} - ${period.end}
-                                                            </div> 
-                                                            <div style="font-size: larger;">
-                                                                <br>
-                                                                <b>Richiedere il preventivo tramite email all'indirizzo booking@villapanoramasuite.it</b>
-                                                            </div>  
-                                                        </li>
-                                                    `;
-                                                    }
-
+                                                if(period.totalCost == "Error in cost calculation") {
                                                     return `
-                                                        <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
-                                                            <div>
-                                                                ${period.start} - ${period.end}
-                                                            </div> 
-                                                            <div style="font-size: larger;">
-                                                                <b>€ ${period.totalCost}</b>
-                                                            </div>  
-                                                            <div style="padding: 10px;">
-                                                                <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">`+translateText("Seleziona", lang)+`</a>
-                                                            </div>
-                                                        </li>
+                                                    <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
+                                                        <div>${period.start} - ${period.end}</div> 
+                                                        <div style="font-size: larger;">
+                                                            <br>
+                                                            <b>Richiedere il preventivo tramite email all'indirizzo booking@villapanoramasuite.it</b>
+                                                        </div>  
+                                                    </li>
                                                     `;
-                                                }).join('')}
-                                            </ul>
-                                        </div>
+                                                }
+
+                                                return `
+                                                    <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
+                                                        <div>${period.start} - ${period.end}</div> 
+                                                        <div style="font-size: larger;"><b>€ ${period.totalCost}</b></div>  
+                                                        <div style="padding: 10px;">
+                                                            <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">
+                                                                ${translateText("Seleziona", lang)}
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                `;
+                                            }).join('')}
+                                        </ul>
                                     </div>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
+            </div>
             `;
 
-            var htmlResponse = "";
-            if (alternativeAvailability.length === 0) 
+            let htmlResponse = "";
+            if (alternativeAvailability.length === 0) {
                 htmlResponse = htmlResponsePrefixNoAlternative + htmlResponsePostfix;
-            else
+            } else {
                 htmlResponse = htmlResponsePrefixNoAvail + htmlAlternativeResponse + htmlResponsePostfix;
+            }
 
             res.send(htmlResponse);
         }
