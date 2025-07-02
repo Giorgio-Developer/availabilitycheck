@@ -23,7 +23,7 @@ const { findNextAvailablePeriods } = require('../utils/dateUtils'); // Supponend
 const calendarsPerRoom = {
     "Calypso": [
         "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com",
-        "h3144fvvdhmk3pc9d3lo76vt0vpdcm0s@import.calendar.google.com"
+        "69ror1fdqa43q8peb2uoe9cvooaua4r8@import.calendar.google.com"
     ],
     "Hermes": [
         "htbraiua1erp01qpo1g46nsn8bsibcuq@import.calendar.google.com",
