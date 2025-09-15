@@ -125,7 +125,7 @@ describe('Admin Authentication and Dashboard', () => {
 
       try {
         const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
-          model: "gpt-4o",
+          model: "gpt-5",
           messages: [{ role: "user", content: prompt }],
         }, {
           headers: {
