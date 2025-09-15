@@ -7,7 +7,17 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:integration": "jest --testPathPattern=integration"
+    "test:integration": "jest --testPathPattern=integration",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:admin": "jest tests/integration/admin.test.js",
+    "test:routes": "jest tests/integration/calendar.route.test.js tests/integration/freebusy.route.test.js",
+    "test:utils": "jest tests/unit/dateUtils.test.js tests/unit/csvUtils.test.js tests/unit/translate.test.js",
+    "test:booking": "jest tests/unit/BookingHelper.test.js",
+    "test:google": "jest tests/unit/GoogleCalendar.test.js",
+    "test:app": "jest tests/integration/app.test.js",
+    "test:install": "node test-runner.js install",
+    "test:verbose": "jest --verbose",
+    "test:debug": "jest --detectOpenHandles --verbose"
   },
   "keywords": [],
   "author": "",
@@ -25,10 +35,10 @@
     "openai": "^3.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
-    "supertest": "^6.3.3",
-    "@types/jest": "^29.5.8",
-    "jest-environment-node": "^29.7.0"
+    "jest-environment-node": "^29.7.0",
+    "supertest": "^6.3.4"
   },
   "jest": {
     "testEnvironment": "node",
@@ -44,6 +54,8 @@
       "**/tests/**/*.test.js",
       "**/tests/**/*.spec.js"
     ],
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"]
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ]
   }
 }

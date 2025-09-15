@@ -86,9 +86,10 @@ async function findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, c
 
 function formatDate(dateIsoString) {
     const date = new Date(dateIsoString);
-    let day = date.getDate().toString().padStart(2, '0');
-    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript conta i mesi da 0
-    let year = date.getFullYear();
+    // Usa UTC per evitare problemi di timezone
+    let day = date.getUTCDate().toString().padStart(2, '0');
+    let month = (date.getUTCMonth() + 1).toString().padStart(2, '0'); // JavaScript conta i mesi da 0
+    let year = date.getUTCFullYear();
     return `${day}-${month}-${year}`;
 }
 
@@ -102,6 +103,21 @@ function convertDate(inputDate) {
     const day = parts[0];
     const month = parts[1];
     const year = parts[2];
+
+    // Validazione più rigorosa: verifica che sia formato dd-mm-yyyy
+    // Il giorno dovrebbe essere 1-2 cifre (01-31), il mese 1-2 cifre (01-12), l'anno 4 cifre
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum) ||
+        dayNum < 1 || dayNum > 31 ||
+        monthNum < 1 || monthNum > 12 ||
+        year.length !== 4 ||
+        (day.length !== 1 && day.length !== 2) ||
+        (month.length !== 1 && month.length !== 2)) {
+        throw new Error('Formato data non valido. Assicurati che sia "dd-mm-yyyy".');
+    }
 
     // Restituiamo una nuova stringa nel formato "yyyy-mm-dd"
     return `${year}-${month}-${day}`;

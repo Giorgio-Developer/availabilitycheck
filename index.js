@@ -164,9 +164,11 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
 
 
 
-// Avvia il server
-app.listen(port, () => {
-    console.log(`Server in ascolto su http://localhost:${port}`);
-});
+// Avvia il server solo se non siamo in ambiente di test
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => {
+        console.log(`Server in ascolto su http://localhost:${port}`);
+    });
+}
 
 module.exports = app;
