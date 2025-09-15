@@ -4,6 +4,8 @@ const session = require('express-session');
 const path = require('path');
 const axios = require('axios');
 const OpenAI = require('openai');
+const multer = require('multer');
+const fs = require('fs');
 
 // ENV Constants
 const apiKey = process.env.OPENAI_API_KEY;
@@ -38,6 +40,21 @@ app.set('views', path.join(__dirname, 'views')); // Imposta la cartella views
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static(path.join(__dirname, 'assets'))); // Servire i file statici dalla cartella assets
+
+// Configura multer per l'upload dei file
+const upload = multer({
+    dest: 'temp_uploads/',
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo file CSV sono consentiti!'), false);
+        }
+    },
+    limits: {
+        fileSize: 1024 * 1024 // 1MB
+    }
+});
 
 
 // Rotte per il calendario e la disponibilità
@@ -161,8 +178,124 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
     }
 });
 
+// CSV MANAGEMENT ROUTES
 
+// Rotta per la pagina di gestione CSV
+app.get('/admin/csv/:roomName', checkAdminAuth, (req, res) => {
+    const roomName = req.params.roomName;
+    res.render('csv-management', { roomName });
+});
 
+// Rotta per il download del CSV
+app.get('/admin/csv/download/:roomName', checkAdminAuth, async (req, res) => {
+    const roomName = req.params.roomName;
+    const csvFilePath = path.join(__dirname, 'rooms_prices', `${roomName}.csv`);
+
+    try {
+        if (fs.existsSync(csvFilePath)) {
+            res.download(csvFilePath, `${roomName}.csv`);
+        } else {
+            res.status(404).send('File CSV non trovato');
+        }
+    } catch (error) {
+        console.error('Errore durante il download del CSV:', error);
+        res.status(500).send('Errore durante il download del file');
+    }
+});
+
+// Rotta per l'upload del CSV
+app.post('/admin/csv/upload/:roomName', checkAdminAuth, upload.single('csvFile'), async (req, res) => {
+    const roomName = req.params.roomName;
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'Nessun file caricato' });
+    }
+
+    try {
+        // Leggi il file caricato
+        const uploadedFilePath = req.file.path;
+        const csvContent = fs.readFileSync(uploadedFilePath, 'utf8');
+
+        // Parsing del CSV
+        const lines = csvContent.trim().split('\n');
+        if (lines.length < 2) {
+            fs.unlinkSync(uploadedFilePath); // Rimuovi il file temporaneo
+            return res.status(400).json({ error: 'Il file CSV deve contenere almeno una riga di dati oltre all\'header' });
+        }
+
+        // Verifica header
+        const expectedHeaders = ['data inizio', 'data fine', 'costo'];
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+        const hasValidHeaders = expectedHeaders.every(header =>
+            headers.some(h => h.includes(header.split(' ')[0]) && h.includes(header.split(' ')[1] || ''))
+        );
+
+        if (!hasValidHeaders) {
+            fs.unlinkSync(uploadedFilePath);
+            return res.status(400).json({ error: 'Header del CSV non validi. Devono essere: data inizio, data fine, costo' });
+        }
+
+        // Parsing dei dati
+        const csvData = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => v.trim());
+            if (values.length >= 3) {
+                csvData.push({
+                    'data inizio': values[0],
+                    'data fine': values[1],
+                    costo: values[2]
+                });
+            }
+        }
+
+        // Validazione delle date
+        const validationError = validateDates(csvData);
+        if (validationError) {
+            fs.unlinkSync(uploadedFilePath);
+            return res.status(400).json({ error: validationError });
+        }
+
+        // Chiamata AI per validazione prezzi
+        const prompt =
+            "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?"+
+            `${csvData.map(row => `Data inizio: ${row['data inizio']}, Data fine: ${row['data fine']}, Costo: ${row.costo}`).join('\n')}`;
+
+        const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-4o",
+            messages: [{ role: "user", content: prompt }],
+        }, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const aiConfirmation = openAiResponse.data.choices[0].message.content;
+
+        // Salva il nuovo CSV
+        await writeCSV(roomName, csvData);
+
+        // Rimuovi il file temporaneo
+        fs.unlinkSync(uploadedFilePath);
+
+        res.json({
+            success: true,
+            data: csvData,
+            aiConfirmation: aiConfirmation,
+            message: 'File CSV caricato e validato con successo'
+        });
+
+    } catch (error) {
+        // Pulisci il file temporaneo in caso di errore
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+
+        console.error('Errore durante l\'upload del CSV:', error);
+        res.status(500).json({ error: 'Errore durante il caricamento del file: ' + error.message });
+    }
+});
 
 // Avvia il server solo se non siamo in ambiente di test
 if (process.env.NODE_ENV !== 'test') {
