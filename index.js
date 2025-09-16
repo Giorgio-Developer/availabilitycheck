@@ -22,6 +22,38 @@ const { convertDateToDDMMYYYY, validateDates } = require('./utils/dateUtils');
 const { readCSV, writeCSV } = require('./utils/csvUtils');
 const { admin } = require('googleapis/build/src/apis/admin');
 
+// AI PROMPT MANAGEMENT FUNCTIONS
+
+// Funzione per leggere il prompt dal file
+function readPrompt() {
+    const promptPath = path.join(__dirname, 'ai_prompt.txt');
+    try {
+        if (fs.existsSync(promptPath)) {
+            return fs.readFileSync(promptPath, 'utf8').trim();
+        } else {
+            // Prompt di default se il file non esiste
+            const defaultPrompt = "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?";
+            fs.writeFileSync(promptPath, defaultPrompt, 'utf8');
+            return defaultPrompt;
+        }
+    } catch (error) {
+        console.error('Errore nella lettura del prompt:', error);
+        return "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?";
+    }
+}
+
+// Funzione per scrivere il prompt nel file
+function writePrompt(prompt) {
+    const promptPath = path.join(__dirname, 'ai_prompt.txt');
+    try {
+        fs.writeFileSync(promptPath, prompt, 'utf8');
+        return true;
+    } catch (error) {
+        console.error('Errore nella scrittura del prompt:', error);
+        return false;
+    }
+}
+
 // Crea un'applicazione Express
 const app = express();
 
@@ -150,8 +182,8 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
         return res.status(500).json({ error: validationError });
     }
 
-    const prompt = 
-        "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?"+
+    const promptTemplate = readPrompt();
+    const prompt = promptTemplate + " " +
     `${csvData.map(row => `Data inizio: ${row['data inizio']}, Data fine: ${row['data fine']}, Costo: ${row.costo}`).join('\n')}`;
 
     // Chiamata alle API di OpenAI per chiedere conferma della congruità dei prezzi
@@ -175,6 +207,40 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
         res.json({ success: true, data: csvData, aiConfirmation: aiConfirmation });
     } catch (error) {
         res.status(500).json({ error: 'Errore durante la scrittura nel file CSV' });
+    }
+});
+
+// AI PROMPT MANAGEMENT ROUTES
+
+// Rotta per ottenere il prompt corrente
+app.get('/admin/prompt', checkAdminAuth, (req, res) => {
+    try {
+        const prompt = readPrompt();
+        res.json({ success: true, prompt: prompt });
+    } catch (error) {
+        console.error('Errore nel caricamento del prompt:', error);
+        res.status(500).json({ success: false, error: 'Errore nel caricamento del prompt' });
+    }
+});
+
+// Rotta per salvare il nuovo prompt
+app.post('/admin/prompt', checkAdminAuth, (req, res) => {
+    const { prompt } = req.body;
+
+    if (!prompt || !prompt.trim()) {
+        return res.status(400).json({ success: false, error: 'Il prompt non può essere vuoto' });
+    }
+
+    try {
+        const success = writePrompt(prompt.trim());
+        if (success) {
+            res.json({ success: true, message: 'Prompt salvato con successo' });
+        } else {
+            res.status(500).json({ success: false, error: 'Errore nel salvataggio del prompt' });
+        }
+    } catch (error) {
+        console.error('Errore nel salvataggio del prompt:', error);
+        res.status(500).json({ success: false, error: 'Errore nel salvataggio del prompt' });
     }
 });
 
@@ -257,8 +323,8 @@ app.post('/admin/csv/upload/:roomName', checkAdminAuth, upload.single('csvFile')
         }
 
         // Chiamata AI per validazione prezzi
-        const prompt =
-            "Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. Ho questi dati di prezzo per una stanza di unn B&B. Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?"+
+        const promptTemplate = readPrompt();
+        const prompt = promptTemplate + " " +
             `${csvData.map(row => `Data inizio: ${row['data inizio']}, Data fine: ${row['data fine']}, Costo: ${row.costo}`).join('\n')}`;
 
         const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {

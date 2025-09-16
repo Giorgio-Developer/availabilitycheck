@@ -1,0 +1,5 @@
+Rispondi in html, che può essere direttamente incluso all'interno di un <div></div>. Non includere cose come ```html o ```. 
+
+Ho questi dati di prezzo per una stanza di un B&B. 
+
+Ritieni ci siano congrui o che ci sia qualche errore, tipo un prezzo eccessivamente basso o eccessivamente alto?
