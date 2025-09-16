@@ -188,7 +188,7 @@ app.post('/admin/edit/:roomName', checkAdminAuth, async (req, res) => {
 
     // Chiamata alle API di OpenAI per chiedere conferma della congruità dei prezzi
     const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
-        model: "gpt-5",
+        model: "gpt-5-nano",
         messages: [{ role: "user", content: prompt }],
     }, {
         headers: {
@@ -328,7 +328,7 @@ app.post('/admin/csv/upload/:roomName', checkAdminAuth, upload.single('csvFile')
             `${csvData.map(row => `Data inizio: ${row['data inizio']}, Data fine: ${row['data fine']}, Costo: ${row.costo}`).join('\n')}`;
 
         const openAiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: "gpt-5",
+            model: "gpt-5-nano",
             messages: [{ role: "user", content: prompt }],
         }, {
             headers: {
