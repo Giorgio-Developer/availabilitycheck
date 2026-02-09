@@ -73,9 +73,6 @@ router.post('/freebusy', async (req, res) => {
 
     var wordpressBaseUrl = 'https://villapanoramasuite.it/booking-engine-reservation-form'; // URL del sito WordPress
 
-    const id_villa_panorama = "hm24qf24l1v16fqg8iv9sgbnt1s7ctm5@import.calendar.google.com";
-    const id_calypso = "1uo0g04eif8o44c4mcn8dlufim485l0l@import.calendar.google.com";
-
     try {
         const oAuth2Client = await googleCalendar.authorize();
         // let { calendarIds, timeMin, timeMax, adults, children, pets, lang } = req.body;
@@ -275,9 +272,6 @@ router.post('/freebusy', async (req, res) => {
             calendarIds = [calendarIds];
         }
 
-        if(adults > 2) 
-            calendarIds = [id_villa_panorama, id_calypso];
-
         const requestBody = {
             timeMin: new Date(timeMin).toISOString(),
             timeMax: new Date(timeMax).toISOString(),
@@ -287,13 +281,19 @@ router.post('/freebusy', async (req, res) => {
             pets: pets,
         };
 
-        // Qui usiamo la nuova logica per verificare ogni stanza
+        // Determina quali stanze controllare basandosi sul numero di adulti
+        let roomsToCheck = Object.keys(calendarsPerRoom);
+        if (adults > 2) {
+            roomsToCheck = ["Villa Panorama", "Calypso"];
+        }
+
+        // Qui usiamo la nuova logica per verificare ogni stanza filtrata
         let availableRooms = [];
         let allFreeBusyResponses = {};
 
-        for (const roomName in calendarsPerRoom) {
+        for (const roomName of roomsToCheck) {
             const { allCalendarsFree, freeBusyResponse } = await checkRoomAvailability(oAuth2Client, roomName, timeMin, timeMax, googleCalendar);
-            
+
             // Memorizziamo sempre la risposta per ogni stanza
             allFreeBusyResponses[roomName] = freeBusyResponse;
 
@@ -354,10 +354,10 @@ router.post('/freebusy', async (req, res) => {
             res.send(htmlResponse);
         } else {
             // Trova prossime disponibilità utilizzando la risposta di checkFreeBusy
-            // logica per alternative quando non ci sono camere disponibili
+            // logica per alternative quando non ci sono camere disponibili (solo per le stanze filtrate)
             let alternativeAvailability = [];
 
-            for (const roomName in calendarsPerRoom) {
+            for (const roomName of roomsToCheck) {
                 const calendars = calendarsPerRoom[roomName];
                 const freeBusyResponse = allFreeBusyResponses[roomName];
 
@@ -384,7 +384,7 @@ router.post('/freebusy', async (req, res) => {
             <div class="pl-5 pr-5">
                 <div class="form-group col-md-12">
                     <ul class="row list-unstyled justify-content-center" style="padding-left: 0px;">
-                        ${alternativeAvailability.map((room, index) => `
+                        ${alternativeAvailability.map(room => `
                             <li class="${alternativeAvailability.length < 3 ? 'col-md-6' : 'col-md-4'} d-flex mb-4 justify-content-center">
                                 <div class="room card w-100">
                                     <img src="/assets/images/${room.image}" alt="${room.name}" class="card-img-top">
