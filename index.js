@@ -363,6 +363,132 @@ app.post('/admin/csv/upload/:roomName', checkAdminAuth, upload.single('csvFile')
     }
 });
 
+// Rotta per il visualizzatore dei calendari
+app.get('/admin/calendar-viewer', checkAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'calendar-viewer-simple.html'));
+});
+
+// API endpoint per ottenere gli eventi di una camera specifica
+app.get('/admin/calendar-events/:roomName', checkAdminAuth, async (req, res) => {
+    try {
+        const roomName = req.params.roomName;
+        console.log(`Caricamento eventi per camera: ${roomName}`);
+
+        // Importa il mapping delle camere dai calendari
+        const { calendarsPerRoom } = require('./routes/freebusy');
+
+        if (!calendarsPerRoom[roomName]) {
+            console.error(`Camera non trovata: ${roomName}`);
+            return res.status(404).json({ error: `Camera non trovata: ${roomName}` });
+        }
+
+        const calendars = calendarsPerRoom[roomName];
+        console.log(`Calendari per ${roomName}:`, calendars);
+
+        // Calcola il range di date (dal 2024 al 2027 per catturare tutti gli eventi)
+        const now = new Date(); // Necessario per i mock events
+        const timeMin = new Date('2024-01-01T00:00:00Z').toISOString();
+        const timeMax = new Date('2027-12-31T23:59:59Z').toISOString();
+
+        console.log(`Range date: ${timeMin} -> ${timeMax}`);
+
+        const allEvents = [];
+
+        // Per debugging: creiamo degli eventi fittizi se Google Calendar non funziona
+        const mockEvents = [
+            {
+                id: 'mock1',
+                summary: 'Prenotazione Test 1',
+                start: { dateTime: new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000)).toISOString() },
+                end: { dateTime: new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000)).toISOString() },
+                calendarSource: 'calendar1'
+            },
+            {
+                id: 'mock2',
+                summary: 'Prenotazione Test 2',
+                start: { dateTime: new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)).toISOString() },
+                end: { dateTime: new Date(now.getTime() + (9 * 24 * 60 * 60 * 1000)).toISOString() },
+                calendarSource: 'calendar2'
+            }
+        ];
+
+        try {
+            const GoogleCalendar = require('./GoogleCalendar');
+            const googleCalendar = new GoogleCalendar();
+
+            // Ottieni i token di autenticazione
+            const oAuth2Client = await googleCalendar.authorize();
+            console.log('Autorizzazione Google Calendar riuscita');
+
+            // Ottieni gli eventi da entrambi i calendari
+            for (let i = 0; i < calendars.length; i++) {
+                const calendarId = calendars[i];
+                console.log(`Caricamento calendario ${i + 1}: ${calendarId}`);
+
+                try {
+                    const events = await googleCalendar.listEvents(oAuth2Client, calendarId, timeMin, timeMax);
+                    console.log(`Trovati ${events.length} eventi per calendario ${i + 1}`);
+
+                    // Debug: stampa il primo evento se esiste
+                    if (events.length > 0) {
+                        console.log(`Primo evento calendario ${i + 1}:`, JSON.stringify(events[0], null, 2));
+                    }
+
+                    // Aggiungi la fonte del calendario a ogni evento
+                    events.forEach((event, index) => {
+                        console.log(`Evento ${index + 1} calendario ${i + 1}:`, {
+                            id: event.id,
+                            summary: event.summary,
+                            start: event.start,
+                            end: event.end,
+                            originalEvent: !!event
+                        });
+                        event.calendarSource = `calendar${i + 1}`;
+                        event.calendarId = calendarId;
+                    });
+
+                    allEvents.push(...events);
+                } catch (calendarError) {
+                    console.error(`Errore nel caricamento del calendario ${i + 1} per ${roomName}:`, calendarError.message);
+                    console.error('Stack trace calendario:', calendarError.stack);
+                    // Continua con gli altri calendari anche se uno fallisce
+                }
+            }
+
+            // Se non abbiamo eventi da Google Calendar, mostra comunque i mock
+            if (allEvents.length === 0) {
+                console.log('Nessun evento da Google Calendar, uso eventi mock per debugging');
+                // Commentiamo temporaneamente i mock per vedere cosa succede con Google Calendar
+                // allEvents.push(...mockEvents);
+            }
+
+        } catch (authError) {
+            console.error('Errore di autenticazione Google Calendar:', authError.message);
+            console.error('Stack trace completo:', authError.stack);
+            console.log('Google Calendar non disponibile, uso eventi mock per debugging');
+            allEvents.push(...mockEvents);
+        }
+
+        console.log(`Totale eventi restituiti: ${allEvents.length}`);
+
+        res.json({
+            roomName,
+            events: allEvents,
+            calendars: calendars.length,
+            timeRange: { timeMin, timeMax },
+            debug: true
+        });
+
+    } catch (error) {
+        console.error('Errore nel caricamento degli eventi del calendario:', error);
+        res.status(500).json({
+            error: 'Errore nel caricamento degli eventi del calendario',
+            details: error.message,
+            stack: error.stack
+        });
+    }
+});
+
 // Avvia il server solo se non siamo in ambiente di test
 if (process.env.NODE_ENV !== 'test') {
     app.listen(port, () => {

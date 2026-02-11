@@ -467,3 +467,4 @@ function formatPets(pets) {
 }
 
 module.exports = router;
+module.exports.calendarsPerRoom = calendarsPerRoom;
