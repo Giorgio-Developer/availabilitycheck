@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const BookingHelper = require('../BookingHelper'); // Importa la classe BookingHelper
 const GoogleCalendar = require('../GoogleCalendar'); // Assicurati che GoogleCalendar sia definito correttamente
-const { convertDate } = require('../utils/dateUtils');
+// const { convertDate } = require('../utils/dateUtils'); // Rimosso - non più necessario
 
 const googleCalendar = new GoogleCalendar();
 const { 
@@ -17,7 +17,7 @@ const {
 
 // Aggiungi qui tutte le altre funzioni che sono utilizzate nella rotta, come translateText, convertDate, etc.
 const { translateText } = require('../utils/translate'); // Supponendo che tu abbia creato una funzione translateText in un file separato
-const { findNextAvailablePeriods, mergeOverlappingPeriods } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
+const { findNextAvailablePeriods, mergeOverlappingPeriods, formatDateForAPI } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
 
 
 const calendarsPerRoom = {
@@ -396,28 +396,30 @@ router.post('/freebusy', async (req, res) => {
                                         <h5 class="room-name card-title">${room.name}</h5>
                                         <ul class="list-unstyled" style="font-weight: 300; font-size: smaller;">
                                             ${room.availablePeriods.map(period => {
-                                                const formattedStartDate = convertDate(period.start);
-                                                const formattedEndDate = convertDate(period.end);
+                                                // Usa i formati corretti: start/end sono già formattati per display
+                                                // startISO/endISO sono per le API
+                                                const apiStartDate = formatDateForAPI(period.startISO);
+                                                const apiEndDate = formatDateForAPI(period.endISO);
                                                 pets = formatPets(pets);
 
                                                 if(period.totalCost == "Error in cost calculation") {
                                                     return `
                                                     <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
-                                                        <div>${period.start} - ${period.end}</div> 
+                                                        <div>${period.start} - ${period.end}</div>
                                                         <div style="font-size: larger;">
                                                             <br>
                                                             <b>Richiedere il preventivo tramite email all'indirizzo booking@villapanoramasuite.it</b>
-                                                        </div>  
+                                                        </div>
                                                     </li>
                                                     `;
                                                 }
 
                                                 return `
                                                     <li class="d-flex justify-content-between align-items-center py-2" style="display: block !important;">
-                                                        <div>${period.start} - ${period.end}</div> 
-                                                        <div style="font-size: larger;"><b>€ ${period.totalCost}</b></div>  
+                                                        <div>${period.start} - ${period.end}</div>
+                                                        <div style="font-size: larger;"><b>€ ${period.totalCost}</b></div>
                                                         <div style="padding: 10px;">
-                                                            <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(formattedStartDate)}&checkout=${encodeURIComponent(formattedEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">
+                                                            <a href="${wordpressBaseUrl}?room=${encodeURIComponent(room.name)}&checkin=${encodeURIComponent(apiStartDate)}&checkout=${encodeURIComponent(apiEndDate)}&adults=${adults}&children=${children}&pets=${pets}&price=${period.totalCost}&lang=${lang}" class="btn btn-sm btn-primary" style="font-size: smaller;">
                                                                 ${translateText("Seleziona", lang)}
                                                             </a>
                                                         </div>

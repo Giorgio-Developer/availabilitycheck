@@ -47,9 +47,34 @@ function validateDates(data) {
 }
 
 async function findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, children, pets, roomName) {
+    // Validazione edge cases
+    if (!timeMin || !timeMax) {
+        throw new Error('timeMin and timeMax are required');
+    }
+
+    const startDate = new Date(timeMin);
+    const endDate = new Date(timeMax);
+    const now = new Date();
+
+    // Verifica che le date siano valide
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Invalid date format');
+    }
+
+    // Verifica che timeMin < timeMax
+    if (startDate >= endDate) {
+        throw new Error('timeMin must be before timeMax');
+    }
+
+    // Verifica che le date siano nel futuro (con tolleranza di 1 ora)
+    const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
+    if (endDate < oneHourAgo) {
+        throw new Error('Cannot search for periods in the past');
+    }
+
     const availablePeriods = [];
 
-    if (busyPeriods.length === 0) {
+    if (!busyPeriods || busyPeriods.length === 0) {
         // Se non ci sono periodi occupati, tutto il range è disponibile
         availablePeriods.push({ start: timeMin, end: timeMax });
         return availablePeriods;
@@ -75,25 +100,60 @@ async function findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, c
         availablePeriods.push({ start: sortedBusyPeriods[sortedBusyPeriods.length - 1].end, end: timeMax });
     }
 
+    // Filtra periodi troppo corti (meno di 1 giorno)
+    const validPeriods = availablePeriods.filter(period => {
+        const start = new Date(period.start);
+        const end = new Date(period.end);
+        const diffHours = (end - start) / (1000 * 60 * 60);
+        return diffHours >= 12; // Almeno 12 ore (mezza giornata)
+    });
+
     // Calcolo del costo totale per ciascun periodo disponibile
-    return Promise.all(availablePeriods.map(async period => {
-        const bookings = await BookingHelper.readCSV(`rooms_prices/${roomName}.csv`);
-        const totalCost = BookingHelper.calculateTotalCostV2(bookings, period.start, period.end, adults, children, pets);
-        return {
-            start: formatDate(period.start),
-            end: formatDate(period.end),
-            totalCost
-        };
+    return Promise.all(validPeriods.map(async period => {
+        try {
+            const bookings = await BookingHelper.readCSV(`rooms_prices/${roomName}.csv`);
+            const totalCost = BookingHelper.calculateTotalCostV2(bookings, period.start, period.end, adults, children, pets);
+            return {
+                start: formatDateForDisplay(period.start),
+                end: formatDateForDisplay(period.end),
+                startISO: period.start, // Manteniamo anche il formato ISO per API
+                endISO: period.end,
+                totalCost
+            };
+        } catch (error) {
+            return {
+                start: formatDateForDisplay(period.start),
+                end: formatDateForDisplay(period.end),
+                startISO: period.start,
+                endISO: period.end,
+                totalCost: "Error in cost calculation"
+            };
+        }
     }));
 }
 
-function formatDate(dateIsoString) {
+// Funzione per formattare una data ISO in formato dd-mm-yyyy (per display)
+function formatDateForDisplay(dateIsoString) {
     const date = new Date(dateIsoString);
-    // Usa UTC per evitare problemi di timezone
-    let day = date.getUTCDate().toString().padStart(2, '0');
-    let month = (date.getUTCMonth() + 1).toString().padStart(2, '0'); // JavaScript conta i mesi da 0
-    let year = date.getUTCFullYear();
+    // Usa il fuso orario locale per evitare problemi di shift
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+    let year = date.getFullYear();
     return `${day}-${month}-${year}`;
+}
+
+// Funzione per convertire da ISO a formato yyyy-mm-dd (per form/API)
+function formatDateForAPI(dateIsoString) {
+    const date = new Date(dateIsoString);
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+    let year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+}
+
+// Manteniamo per compatibilità (deprecata)
+function formatDate(dateIsoString) {
+    return formatDateForDisplay(dateIsoString);
 }
 
 function convertDate(inputDate) {
@@ -165,6 +225,8 @@ module.exports = {
     validateDates,
     findNextAvailablePeriods,
     formatDate,
+    formatDateForDisplay,
+    formatDateForAPI,
     convertDate,
     mergeOverlappingPeriods
 };
