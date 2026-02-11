@@ -398,22 +398,14 @@
             border-radius: 0.375rem;
             margin-bottom: 1rem;
         }
-        .event-list {
-            background-color: #2a2a2a;
-            border-radius: 0.375rem;
-            padding: 1rem;
-            margin-top: 1rem;
+        .btn-agenda {
+            transition: all 0.2s ease !important;
         }
-        .event-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            background-color: #333;
-            border-radius: 0.25rem;
+        .btn-agenda:hover {
+            transform: translateY(-1px) !important;
         }
-        .event-item:last-child {
-            margin-bottom: 0;
+        .btn-agenda:active {
+            transform: translateY(0) !important;
         }
         .event-source {
             width: 12px;
@@ -641,7 +633,7 @@
                             Caricamento eventi per ${roomName}...
                         </div>
                         <div id="calendar-${roomName.replace(/\s+/g, '')}" style="display: none;"></div>
-                        <div id="events-list-${roomName.replace(/\s+/g, '')}" style="display: none;"></div>
+                        <div id="agenda-button-container-${roomName.replace(/\s+/g, '')}" style="display: none; text-align: center; margin-top: 1rem;"></div>
                     `;
                     container.appendChild(roomSection);
 
@@ -686,14 +678,14 @@
                     loadingDiv.style.display = 'none';
                 }
 
-                // Mostra il calendario e la lista eventi
+                // Mostra il calendario e il bottone agenda
                 const calendarDiv = roomSection.querySelector(`#calendar-${roomName.replace(/\s+/g, '')}`);
-                const eventsDiv = roomSection.querySelector(`#events-list-${roomName.replace(/\s+/g, '')}`);
+                const agendaContainer = roomSection.querySelector(`#agenda-button-container-${roomName.replace(/\s+/g, '')}`);
 
-                if (calendarDiv && eventsDiv) {
-                    console.log('Mostrando calendario e eventi...');
+                if (calendarDiv && agendaContainer) {
+                    console.log('Mostrando calendario e agenda...');
                     calendarDiv.style.display = 'block';
-                    eventsDiv.style.display = 'block';
+                    agendaContainer.style.display = 'block';
 
                     // Processa gli eventi per identificare sovrapposizioni
                     console.log(`Processando ${data.events ? data.events.length : 0} eventi...`);
@@ -703,12 +695,12 @@
                     // Crea il calendario personalizzato
                     createCustomCalendar(calendarDiv, processedEvents, roomName);
 
-                    // Crea la lista degli eventi
-                    createEventsList(eventsDiv, processedEvents);
+                    // Crea il bottone agenda
+                    createAgendaButton(agendaContainer, processedEvents, roomName);
                 } else {
                     console.error('Elementi DOM calendario non trovati:', {
                         calendarDiv: !!calendarDiv,
-                        eventsDiv: !!eventsDiv
+                        agendaContainer: !!agendaContainer
                     });
                 }
 
@@ -1150,44 +1142,202 @@
             alert(`📅 Eventi per ${date.toLocaleDateString('it-IT')} - ${roomName}\n\n${eventsList}`);
         }
 
-        // Funzione per creare la lista degli eventi
-        function createEventsList(container, events) {
-            const eventsList = document.createElement('div');
-            eventsList.className = 'event-list';
+        // Funzione per creare il bottone agenda
+        function createAgendaButton(container, events, roomName) {
+            const agendaButton = document.createElement('button');
+            agendaButton.className = 'btn btn-agenda';
+            agendaButton.innerHTML = `
+                <i class="material-icons" style="margin-right: 0.5rem;">list</i>
+                Visualizza Agenda (${events.length} eventi)
+            `;
 
-            const title = document.createElement('h5');
-            title.textContent = 'Eventi del Mese';
-            title.style.color = '#03a9f4';
-            title.style.marginBottom = '1rem';
-            eventsList.appendChild(title);
+            // Stile del bottone
+            agendaButton.style.cssText = `
+                background: linear-gradient(135deg, #03a9f4, #0288d1);
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 8px rgba(3, 169, 244, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+            `;
 
-            if (events.length === 0) {
-                const noEvents = document.createElement('p');
-                noEvents.textContent = 'Nessun evento trovato per questo periodo.';
-                noEvents.style.color = '#666';
-                eventsList.appendChild(noEvents);
-            } else {
-                events.forEach(event => {
-                    const eventItem = document.createElement('div');
-                    eventItem.className = 'event-item';
+            // Effetti hover
+            agendaButton.addEventListener('mouseenter', () => {
+                agendaButton.style.background = 'linear-gradient(135deg, #0288d1, #0277bd)';
+                agendaButton.style.transform = 'translateY(-1px)';
+                agendaButton.style.boxShadow = '0 4px 12px rgba(3, 169, 244, 0.4)';
+            });
 
-                    const eventSource = document.createElement('div');
-                    eventSource.className = 'event-source';
-                    eventSource.style.backgroundColor = event.className === 'event-calendar1' ? '#ff6b6b' :
-                                                       event.className === 'event-calendar2' ? '#4ecdc4' : '#ffd93d';
+            agendaButton.addEventListener('mouseleave', () => {
+                agendaButton.style.background = 'linear-gradient(135deg, #03a9f4, #0288d1)';
+                agendaButton.style.transform = 'translateY(0)';
+                agendaButton.style.boxShadow = '0 2px 8px rgba(3, 169, 244, 0.3)';
+            });
 
-                    const eventText = document.createElement('span');
-                    eventText.innerHTML = `<strong>${event.title}</strong><br>
-                                          ${event.start.toLocaleDateString('it-IT')} - ${event.end.toLocaleDateString('it-IT')}<br>
-                                          <small>${event.calendarSource}</small>`;
+            // Click handler per mostrare l'agenda
+            agendaButton.addEventListener('click', () => {
+                showAgendaModal(events, roomName);
+            });
 
-                    eventItem.appendChild(eventSource);
-                    eventItem.appendChild(eventText);
-                    eventsList.appendChild(eventItem);
-                });
-            }
+            container.appendChild(agendaButton);
+        }
 
-            container.appendChild(eventsList);
+        // Funzione per mostrare l'agenda in un modal
+        function showAgendaModal(events, roomName) {
+            const modal = document.createElement('div');
+            modal.className = 'agenda-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            // Ordina gli eventi per data
+            const sortedEvents = events.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            modal.innerHTML = `
+                <div style="
+                    background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
+                    border-radius: 1rem;
+                    padding: 2rem;
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                    border: 1px solid #444;
+                    color: white;
+                    position: relative;
+                    transform: scale(0.9);
+                    animation: modalSlideIn 0.3s ease forwards;
+                ">
+                    <button onclick="this.closest('.agenda-modal').remove()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        color: #ccc;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        transition: background-color 0.2s ease;
+                    " onmouseover="this.style.backgroundColor='#444'" onmouseout="this.style.backgroundColor='transparent'">×</button>
+
+                    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+                        <i class="material-icons" style="font-size: 2rem; color: #03a9f4; margin-right: 1rem;">list</i>
+                        <div>
+                            <h3 style="color: #03a9f4; margin: 0; font-size: 1.5rem;">Agenda - ${roomName}</h3>
+                            <p style="color: #ccc; margin: 0.25rem 0 0 0; font-size: 0.9rem;">${sortedEvents.length} eventi trovati</p>
+                        </div>
+                    </div>
+
+                    ${sortedEvents.length === 0 ? `
+                        <div style="
+                            text-align: center;
+                            padding: 3rem 1rem;
+                            color: #666;
+                            font-size: 1.1rem;
+                        ">
+                            <i class="material-icons" style="font-size: 3rem; margin-bottom: 1rem; color: #555;">event_note</i><br>
+                            Nessun evento trovato per questo periodo
+                        </div>
+                    ` : sortedEvents.map(event => {
+                        const duration = Math.round((event.end - event.start) / (1000 * 60 * 60 * 24));
+                        const isOverlap = event.className === 'event-overlap';
+                        const eventColor = event.className === 'event-calendar1' ? '#ff6b6b' :
+                                         event.className === 'event-calendar2' ? '#4ecdc4' : '#ffd93d';
+                        const eventIcon = event.className === 'event-calendar1' ? '●' :
+                                        event.className === 'event-calendar2' ? '▲' : '⚠';
+
+                        return `
+                            <div style="
+                                background-color: #333;
+                                border-radius: 0.75rem;
+                                padding: 1.5rem;
+                                margin-bottom: 1rem;
+                                border-left: 4px solid ${eventColor};
+                                transition: transform 0.2s ease;
+                                cursor: pointer;
+                                ${isOverlap ? 'box-shadow: 0 0 0 1px #ffd93d;' : ''}
+                            " onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem;">
+                                    <h4 style="color: #fff; margin: 0; font-size: 1.1rem; flex: 1;">
+                                        <span style="color: ${eventColor}; margin-right: 0.5rem;">${eventIcon}</span>
+                                        ${event.title}
+                                    </h4>
+                                    ${isOverlap ? '<span style="color: #ffd93d; font-size: 1.2rem;">⚠️</span>' : ''}
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; color: #ccc;">
+                                    <div>
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <span style="color: #4caf50; margin-right: 0.25rem;">▶</span>
+                                            <strong>Inizio:</strong><br>
+                                            <span style="margin-left: 1rem;">${event.start.toLocaleString('it-IT')}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: #f44336; margin-right: 0.25rem;">■</span>
+                                            <strong>Fine:</strong><br>
+                                            <span style="margin-left: 1rem;">${event.end.toLocaleString('it-IT')}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <span style="color: #ff9800; margin-right: 0.25rem;">⏰</span>
+                                            <strong>Durata:</strong><br>
+                                            <span style="margin-left: 1rem;">${duration} ${duration === 1 ? 'giorno' : 'giorni'}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: ${eventColor}; margin-right: 0.25rem;">📍</span>
+                                            <strong>Fonte:</strong><br>
+                                            <span style="margin-left: 1rem; color: ${eventColor};">${event.calendarSource}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Chiudi il modal cliccando fuori
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+
+            // Aggiungi supporto per ESC
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
         }
 
         // Carica i calendari quando la pagina è pronta
