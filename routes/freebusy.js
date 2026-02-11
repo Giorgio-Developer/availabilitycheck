@@ -17,7 +17,7 @@ const {
 
 // Aggiungi qui tutte le altre funzioni che sono utilizzate nella rotta, come translateText, convertDate, etc.
 const { translateText } = require('../utils/translate'); // Supponendo che tu abbia creato una funzione translateText in un file separato
-const { findNextAvailablePeriods } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
+const { findNextAvailablePeriods, mergeOverlappingPeriods } = require('../utils/dateUtils'); // Supponendo che tu abbia questa funzione già definita
 
 
 const calendarsPerRoom = {
@@ -367,8 +367,12 @@ router.post('/freebusy', async (req, res) => {
                     combinedBusyPeriods = combinedBusyPeriods.concat(freeBusyResponse[calendarId].busy);
                 });
 
-                // Ora cerca le alternative usando i periodi occupati combinati
-                const periods = await findNextAvailablePeriods(combinedBusyPeriods, timeMin, timeMax, adults, children, pets, roomName);
+                // FIX: Unisci i periodi sovrapposti per garantire che i periodi alternativi
+                // siano disponibili su ENTRAMBI i calendari
+                const mergedBusyPeriods = mergeOverlappingPeriods(combinedBusyPeriods);
+
+                // Ora cerca le alternative usando i periodi occupati uniti
+                const periods = await findNextAvailablePeriods(mergedBusyPeriods, timeMin, timeMax, adults, children, pets, roomName);
 
                 if (periods.length > 0) {
                     alternativeAvailability.push({

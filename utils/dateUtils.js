@@ -55,21 +55,24 @@ async function findNextAvailablePeriods(busyPeriods, timeMin, timeMax, adults, c
         return availablePeriods;
     }
 
+    // FIX: Assicurati che i busyPeriods siano ordinati per data di inizio
+    const sortedBusyPeriods = busyPeriods.slice().sort((a, b) => new Date(a.start) - new Date(b.start));
+
     // Aggiungi disponibilità prima del primo periodo occupato
-    if (new Date(busyPeriods[0].start).getTime() > new Date(timeMin).getTime()) {
-        availablePeriods.push({ start: timeMin, end: busyPeriods[0].start });
+    if (new Date(sortedBusyPeriods[0].start).getTime() > new Date(timeMin).getTime()) {
+        availablePeriods.push({ start: timeMin, end: sortedBusyPeriods[0].start });
     }
 
     // Calcola i gap tra i periodi occupati
-    for (let i = 0; i < busyPeriods.length - 1; i++) {
-        if (new Date(busyPeriods[i].end).getTime() < new Date(busyPeriods[i + 1].start).getTime()) {
-            availablePeriods.push({ start: busyPeriods[i].end, end: busyPeriods[i + 1].start });
+    for (let i = 0; i < sortedBusyPeriods.length - 1; i++) {
+        if (new Date(sortedBusyPeriods[i].end).getTime() < new Date(sortedBusyPeriods[i + 1].start).getTime()) {
+            availablePeriods.push({ start: sortedBusyPeriods[i].end, end: sortedBusyPeriods[i + 1].start });
         }
     }
 
     // Aggiungi disponibilità dopo l'ultimo periodo occupato
-    if (new Date(busyPeriods[busyPeriods.length - 1].end).getTime() < new Date(timeMax).getTime()) {
-        availablePeriods.push({ start: busyPeriods[busyPeriods.length - 1].end, end: timeMax });
+    if (new Date(sortedBusyPeriods[sortedBusyPeriods.length - 1].end).getTime() < new Date(timeMax).getTime()) {
+        availablePeriods.push({ start: sortedBusyPeriods[sortedBusyPeriods.length - 1].end, end: timeMax });
     }
 
     // Calcolo del costo totale per ciascun periodo disponibile
@@ -123,11 +126,45 @@ function convertDate(inputDate) {
     return `${year}-${month}-${day}`;
 }
 
+// Funzione per unire periodi occupati sovrapposti o adiacenti
+function mergeOverlappingPeriods(busyPeriods) {
+    if (busyPeriods.length === 0) {
+        return [];
+    }
+
+    // Ordina i periodi per data di inizio
+    const sortedPeriods = busyPeriods.slice().sort((a, b) => new Date(a.start) - new Date(b.start));
+
+    const mergedPeriods = [sortedPeriods[0]];
+
+    for (let i = 1; i < sortedPeriods.length; i++) {
+        const currentPeriod = sortedPeriods[i];
+        const lastMergedPeriod = mergedPeriods[mergedPeriods.length - 1];
+
+        const currentStart = new Date(currentPeriod.start);
+        const currentEnd = new Date(currentPeriod.end);
+        const lastEnd = new Date(lastMergedPeriod.end);
+
+        // Se il periodo corrente inizia prima o esattamente quando finisce l'ultimo,
+        // sono sovrapposti o adiacenti, quindi li uniamo
+        if (currentStart <= lastEnd) {
+            // Estendi l'ultimo periodo unito fino al massimo tra le due date di fine
+            lastMergedPeriod.end = currentEnd > lastEnd ? currentPeriod.end : lastMergedPeriod.end;
+        } else {
+            // I periodi non si sovrappongono, aggiungi il nuovo periodo
+            mergedPeriods.push(currentPeriod);
+        }
+    }
+
+    return mergedPeriods;
+}
+
 module.exports = {
     convertDateToDDMMYYYY,
     convertToDateObject,
     validateDates,
     findNextAvailablePeriods,
     formatDate,
-    convertDate
+    convertDate,
+    mergeOverlappingPeriods
 };
